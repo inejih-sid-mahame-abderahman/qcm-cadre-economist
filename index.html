@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QCM — Cadre économiste CNSS 2026</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+            background: linear-gradient(145deg, #f0f4fa 0%, #e6ecf5 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1.5rem;
+        }
+        .quiz-container {
+            max-width: 820px;
+            width: 100%;
+            background: #ffffff;
+            border-radius: 2rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 20, 60, 0.25), 0 4px 12px rgba(0, 0, 0, 0.05);
+            padding: 2rem 2rem 2.2rem;
+            transition: all 0.2s;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(4px);
+        }
+        h1 {
+            font-size: 1.9rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            color: #0a2540;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.4rem;
+        }
+        h1 span {
+            background: #1e6f9f;
+            color: white;
+            font-size: 0.9rem;
+            font-weight: 500;
+            padding: 0.2rem 0.9rem;
+            border-radius: 30px;
+            letter-spacing: 0.3px;
+        }
+        .subhead {
+            color: #4a5c6c;
+            font-size: 0.95rem;
+            margin-bottom: 1.8rem;
+            border-left: 4px solid #1e6f9f;
+            padding-left: 1rem;
+            font-weight: 400;
+        }
+        .progress-area {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            color: #2c3e50;
+            margin-bottom: 1.2rem;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+        }
+        .badge {
+            background: #e8f0fe;
+            padding: 0.3rem 1rem;
+            border-radius: 30px;
+            font-weight: 500;
+            color: #1e6f9f;
+            font-size: 0.85rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+        .badge.difficulty {
+            background: #fef7e0;
+            color: #b45f06;
+        }
+        .progress-bar-bg {
+            width: 100%;
+            height: 6px;
+            background: #dbe4ee;
+            border-radius: 10px;
+            margin: 0.8rem 0 1.8rem;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #1e6f9f, #2e9cd6);
+            width: 0%;
+            border-radius: 10px;
+            transition: width 0.25s ease;
+        }
+        .question-text {
+            font-size: 1.3rem;
+            font-weight: 500;
+            color: #0f2a42;
+            line-height: 1.5;
+            margin-bottom: 1.6rem;
+            padding: 0.4rem 0;
+        }
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-bottom: 1.8rem;
+        }
+        .option {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.8rem;
+            background: #f9fcff;
+            border: 1.5px solid #d5e0ec;
+            border-radius: 14px;
+            padding: 0.9rem 1.2rem;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            font-size: 1rem;
+            color: #1d2c3b;
+            line-height: 1.4;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+        }
+        .option:hover {
+            background: #f0f7ff;
+            border-color: #8bb9dd;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 14px rgba(30, 111, 159, 0.08);
+        }
+        .option.selected {
+            border-color: #1e6f9f;
+            background: #e5f0fe;
+            box-shadow: 0 0 0 2px rgba(30, 111, 159, 0.25);
+        }
+        .option.correct {
+            background: #e3f5e9;
+            border-color: #2e7d5e;
+            box-shadow: 0 0 0 2px rgba(46, 125, 94, 0.15);
+        }
+        .option.wrong {
+            background: #ffeaea;
+            border-color: #b83b3b;
+            box-shadow: 0 0 0 2px rgba(184, 59, 59, 0.1);
+        }
+        .option.disabled {
+            pointer-events: none;
+            opacity: 0.85;
+        }
+        .letter {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 26px;
+            height: 26px;
+            background: #d9e5f2;
+            border-radius: 40%;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #1e3f5e;
+            flex-shrink: 0;
+            transition: all 0.1s;
+        }
+        .option.correct .letter {
+            background: #2e7d5e;
+            color: white;
+        }
+        .option.wrong .letter {
+            background: #b83b3b;
+            color: white;
+        }
+        .option.selected .letter {
+            background: #1e6f9f;
+            color: white;
+        }
+        .feedback {
+            background: #f1f7fc;
+            border-radius: 16px;
+            padding: 1rem 1.4rem;
+            margin: 1rem 0 1.6rem;
+            border-left: 5px solid #1e6f9f;
+            color: #1e3c54;
+            font-size: 0.98rem;
+            line-height: 1.5;
+            display: none;
+            animation: fadeIn 0.25s;
+        }
+        .feedback.show {
+            display: block;
+        }
+        .feedback .correct-badge {
+            font-weight: 600;
+            color: #2e7d5e;
+        }
+        .feedback .wrong-badge {
+            font-weight: 600;
+            color: #b83b3b;
+        }
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 0.8rem;
+        }
+        button {
+            font-family: inherit;
+            font-weight: 500;
+            border: none;
+            border-radius: 60px;
+            padding: 0.85rem 2rem;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            background: white;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+        }
+        .btn-primary {
+            background: #1e6f9f;
+            color: white;
+            box-shadow: 0 8px 18px -6px #1e6f9f80;
+            border: 1px solid #1e6f9f;
+        }
+        .btn-primary:hover:not(:disabled) {
+            background: #155e87;
+            transform: translateY(-2px);
+            box-shadow: 0 14px 24px -8px #1e6f9f;
+        }
+        .btn-secondary {
+            background: #ffffff;
+            border: 1.5px solid #cbdae8;
+            color: #1e3f5e;
+        }
+        .btn-secondary:hover:not(:disabled) {
+            background: #f3f9ff;
+            border-color: #1e6f9f;
+        }
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none;
+        }
+        .result-area {
+            text-align: center;
+            padding: 1rem 0 0.5rem;
+        }
+        .result-area h2 {
+            font-size: 2rem;
+            color: #1e3f5e;
+            margin-bottom: 0.5rem;
+        }
+        .result-area .score {
+            font-size: 3rem;
+            font-weight: 700;
+            color: #1e6f9f;
+            margin: 0.6rem 0;
+        }
+        .footer-note {
+            text-align: center;
+            font-size: 0.78rem;
+            color: #8a9aa8;
+            margin-top: 1.8rem;
+            border-top: 1px solid #e6edf5;
+            padding-top: 1rem;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+<div class="quiz-container" id="quizApp">
+    <!-- header -->
+    <h1>📘 Cadre économiste <span>CNSS 2026</span></h1>
+    <div class="subhead">300 questions QCM — difficulté progressive · français</div>
+
+    <!-- progress -->
+    <div class="progress-area">
+        <span class="badge" id="questionCounter">Question 1 / 300</span>
+        <span class="badge difficulty" id="difficultyBadge">Facile</span>
+        <span class="badge" id="scoreDisplay">Score: 0</span>
+    </div>
+    <div class="progress-bar-bg">
+        <div class="progress-fill" id="progressFill" style="width: 0%;"></div>
+    </div>
+
+    <!-- question -->
+    <div id="questionContainer">
+        <div class="question-text" id="questionText">Chargement…</div>
+        <div class="options" id="optionsContainer"></div>
+        <div class="feedback" id="feedbackBox"></div>
+
+        <div class="nav-buttons">
+            <button class="btn-secondary" id="prevBtn" disabled>← Précédent</button>
+            <button class="btn-primary" id="nextBtn" disabled>Suivant →</button>
+        </div>
+    </div>
+
+    <!-- result -->
+    <div id="resultContainer" class="result-area hidden">
+        <h2>🎯 Examen terminé</h2>
+        <div class="score" id="finalScore">0 / 300</div>
+        <div id="finalMessage" style="color: #2c3e50; margin-bottom: 1.5rem;">Votre performance</div>
+        <button class="btn-primary" id="restartBtn" style="margin-top: 0.5rem;">🔄 Recommencer</button>
+    </div>
+
+    <div class="footer-note">Données basées sur l'annonce officielle CNC/CNSS 2026 · Toutes les questions sont en français</div>
+</div>
+
+<script>
+    // ============================================================
+    // DONNÉES : 300 questions (extrait complet du seed)
+    // Format : [texte, [choix...], index_correct, explication, difficulté]
+    // ============================================================
+    const QUESTIONS = [
+        // ---------- FACILES (100) ----------
+        ["Qu'est-ce que la science économique ?", ["La science qui étudie l'allocation des ressources rares pour satisfaire des besoins illimités", "La science qui étudie les phénomènes naturels", "La science qui étudie les langues", "La science qui étudie l'histoire"], 0, "L'économie étudie l'allocation des ressources rares pour satisfaire des besoins illimités.", "easy"],
+        ["Quel est le problème économique fondamental ?", ["La rareté des ressources face à la multiplicité des besoins", "L'abondance des ressources", "La rareté des besoins", "La stabilité des prix"], 0, "Le problème économique fondamental est la rareté des ressources face à la multiplicité des besoins.", "easy"],
+        ["Quels sont les facteurs de production ?", ["Terre, travail, capital, organisation", "L'argent uniquement", "La terre uniquement", "Le travail uniquement"], 0, "Les facteurs de production : terre, travail, capital, organisation.", "easy"],
+        ["Qu'est-ce que la microéconomie ?", ["L'étude du comportement des unités économiques individuelles", "L'étude de l'économie globale", "L'étude du commerce international", "L'étude des finances publiques"], 0, "La microéconomie étudie le comportement des unités économiques individuelles (consommateur, producteur).", "easy"],
+        ["Qu'est-ce que la macroéconomie ?", ["L'étude de l'économie dans son ensemble", "L'étude des unités individuelles", "L'étude du commerce international", "L'étude des finances publiques"], 0, "La macroéconomie étudie l'économie dans son ensemble (production, inflation, chômage).", "easy"],
+        ["Qu'est-ce que le PIB ?", ["La valeur des biens et services finaux produits dans un pays", "La valeur des exportations", "La valeur des importations", "La valeur des investissements"], 0, "Le PIB est la valeur des biens et services finaux produits dans un pays pendant une période.", "easy"],
+        ["Qu'est-ce que le PNB ?", ["La valeur des biens et services produits par les nationaux d'un pays", "La valeur des exportations", "La valeur des importations", "La valeur des investissements"], 0, "Le PNB est la valeur des biens et services produits par les nationaux, à l'intérieur et à l'extérieur.", "easy"],
+        ["Qu'est-ce que l'inflation ?", ["Une hausse générale et durable du niveau des prix", "Une baisse des prix", "Une stabilité des prix", "Une baisse de la monnaie"], 0, "L'inflation est une hausse générale et durable du niveau des prix.", "easy"],
+        ["Qu'est-ce que la déflation ?", ["Une baisse générale et durable du niveau des prix", "Une hausse des prix", "Une stabilité des prix", "Une hausse de la monnaie"], 0, "La déflation est une baisse générale et durable du niveau des prix.", "easy"],
+        ["Qu'est-ce que la récession économique ?", ["Une baisse de l'activité économique pendant plusieurs mois", "Une hausse de l'activité économique", "Une stabilité de l'activité économique", "Une hausse des prix"], 0, "La récession est une baisse de l'activité économique pendant plusieurs mois consécutifs.", "easy"],
+        ["Qu'est-ce que le chômage ?", ["L'absence d'emploi pour les personnes capables et à la recherche d'un travail", "L'absence de travail", "Le travail à temps partiel", "Le travail indépendant"], 0, "Le chômage est l'absence d'emploi pour les personnes capables et à la recherche d'un travail.", "easy"],
+        ["Quels sont les types de chômage ?", ["Chômage conjoncturel, structurel, frictionnel, saisonnier", "Chômage conjoncturel uniquement", "Chômage structurel uniquement", "Chômage saisonnier uniquement"], 0, "Les types de chômage : conjoncturel, structurel, frictionnel, saisonnier.", "easy"],
+        ["Qu'est-ce que l'offre ?", ["La quantité d'un bien offerte à la vente à un prix donné", "La quantité demandée", "Le prix du bien", "La qualité du bien"], 0, "L'offre est la quantité d'un bien offerte à la vente à un prix donné.", "easy"],
+        ["Qu'est-ce que la demande ?", ["La quantité d'un bien demandée à un prix donné", "La quantité offerte", "Le prix du bien", "La qualité du bien"], 0, "La demande est la quantité d'un bien demandée à un prix donné.", "easy"],
+        ["Quelle est la loi de l'offre ?", ["Relation positive entre le prix et la quantité offerte", "Relation négative entre le prix et la quantité offerte", "Aucune relation", "Relation aléatoire"], 0, "Loi de l'offre : relation positive entre le prix et la quantité offerte.", "easy"],
+        ["Quelle est la loi de la demande ?", ["Relation négative entre le prix et la quantité demandée", "Relation positive entre le prix et la quantité demandée", "Aucune relation", "Relation aléatoire"], 0, "Loi de la demande : relation négative entre le prix et la quantité demandée.", "easy"],
+        ["Qu'est-ce que l'équilibre du marché ?", ["L'égalité entre l'offre et la demande", "L'augmentation de l'offre", "L'augmentation de la demande", "La baisse de l'offre"], 0, "L'équilibre du marché est l'égalité entre l'offre et la demande à un prix donné.", "easy"],
+        ["Qu'est-ce que le prix ?", ["La valeur monétaire d'un bien ou service", "La quantité du bien", "La qualité du bien", "Le poids du bien"], 0, "Le prix est la valeur monétaire d'un bien ou service.", "easy"],
+        ["Qu'est-ce que la concurrence ?", ["La rivalité entre producteurs pour gagner des consommateurs", "Le monopole du marché", "Le contrôle de l'État", "La coopération entre producteurs"], 0, "La concurrence est la rivalité entre producteurs pour gagner des consommateurs.", "easy"],
+        ["Qu'est-ce que la concurrence pure et parfaite ?", ["Un marché avec un grand nombre de producteurs et de consommateurs", "Un marché avec un seul producteur", "Un marché avec peu de producteurs", "Un marché public"], 0, "La concurrence pure et parfaite est un marché avec un grand nombre de producteurs et de consommateurs.", "easy"],
+        ["Qu'est-ce que le monopole ?", ["Le contrôle d'un marché par un seul producteur", "La concurrence entre producteurs", "L'intervention de l'État", "La coopération entre producteurs"], 0, "Le monopole est le contrôle d'un marché par un seul producteur.", "easy"],
+        ["Qu'est-ce que l'oligopole ?", ["Le contrôle d'un marché par un petit nombre de producteurs", "Le contrôle par un seul producteur", "La concurrence parfaite", "L'intervention de l'État"], 0, "L'oligopole est le contrôle d'un marché par un petit nombre de producteurs.", "easy"],
+        ["Qu'est-ce que l'élasticité-prix de la demande ?", ["La mesure de la réaction de la quantité demandée à une variation du prix", "La mesure de la réaction de l'offre", "La mesure de la qualité", "La mesure de la quantité"], 0, "L'élasticité-prix de la demande mesure la réaction de la quantité demandée à une variation du prix.", "easy"],
+        ["Qu'est-ce que l'élasticité-prix de l'offre ?", ["La mesure de la réaction de la quantité offerte à une variation du prix", "La mesure de la réaction de la demande", "La mesure de la qualité", "La mesure de la quantité"], 0, "L'élasticité-prix de l'offre mesure la réaction de la quantité offerte à une variation du prix.", "easy"],
+        ["Qu'est-ce que le revenu ?", ["Ce qu'un individu reçoit comme ressources financières", "Ce qu'un individu dépense", "Ce qu'un individu épargne", "Ce qu'un individu investit"], 0, "Le revenu est ce qu'un individu reçoit comme ressources financières.", "easy"],
+        ["Qu'est-ce que la finance publique ?", ["L'étude des recettes et dépenses publiques", "L'étude de la finance des entreprises", "L'étude de la finance des individus", "L'étude de la finance des banques"], 0, "La finance publique étudie les recettes et dépenses publiques de l'État.", "easy"],
+        ["Qu'est-ce que le budget de l'État ?", ["Un document qui fixe les recettes et dépenses de l'État pour une année", "Un document commercial", "Un document personnel", "Un document administratif"], 0, "Le budget de l'État est un document qui fixe les recettes et dépenses de l'État pour une année.", "easy"],
+        ["Qu'est-ce que les recettes publiques ?", ["Les ressources financières de l'État", "Les dépenses de l'État", "Les investissements de l'État", "Les dettes de l'État"], 0, "Les recettes publiques sont les ressources financières de l'État.", "easy"],
+        ["Qu'est-ce que les dépenses publiques ?", ["Les montants dépensés par l'État", "Les recettes de l'État", "Les investissements de l'État", "Les dettes de l'État"], 0, "Les dépenses publiques sont les montants dépensés par l'État.", "easy"],
+        ["Qu'est-ce que les impôts ?", ["Des prélèvements obligatoires imposés par l'État aux individus et entreprises", "Des dons", "Des prêts", "Des aides"], 0, "Les impôts sont des prélèvements obligatoires imposés par l'État aux individus et entreprises.", "easy"],
+        ["Quels sont les types d'impôts ?", ["Impôts directs et indirects", "Impôts directs uniquement", "Impôts indirects uniquement", "Aucun type"], 0, "Les types d'impôts : directs (sur le revenu) et indirects (sur la consommation).", "easy"],
+        ["Qu'est-ce qu'un impôt direct ?", ["Un impôt sur le revenu et la fortune", "Un impôt sur la consommation", "Un impôt douanier", "Une taxe"], 0, "L'impôt direct porte sur le revenu et la fortune.", "easy"],
+        ["Qu'est-ce qu'un impôt indirect ?", ["Un impôt sur la consommation et l'importation", "Un impôt sur le revenu", "Un impôt sur la fortune", "Un impôt foncier"], 0, "L'impôt indirect porte sur la consommation et l'importation.", "easy"],
+        ["Qu'est-ce que la TVA ?", ["Une taxe indirecte sur la consommation", "Un impôt direct sur le revenu", "Un impôt sur les sociétés", "Un impôt sur la fortune"], 0, "La TVA (Taxe sur la Valeur Ajoutée) est une taxe indirecte sur la consommation.", "easy"],
+        ["Quel est le taux de la TVA en Mauritanie ?", ["16%", "18%", "20%", "15%"], 0, "Le taux de la TVA en Mauritanie est de 16%.", "easy"],
+        ["Qu'est-ce que l'impôt sur les sociétés (IS) ?", ["Un impôt sur les bénéfices des sociétés", "Un impôt sur le revenu", "Un impôt sur la consommation", "Un impôt sur la fortune"], 0, "L'impôt sur les sociétés (IS) porte sur les bénéfices des sociétés.", "easy"],
+        ["Qu'est-ce que l'impôt sur les revenus fonciers ?", ["Un impôt sur les revenus des propriétés immobilières", "Un impôt sur les sociétés", "Un impôt sur la consommation", "Un impôt sur la fortune"], 0, "L'impôt sur les revenus fonciers porte sur les revenus des propriétés immobilières.", "easy"],
+        ["Qu'est-ce que l'impôt sur les traitements et salaires ?", ["Un impôt sur le revenu", "Un impôt sur la consommation", "Un impôt sur les sociétés", "Un impôt sur la fortune"], 0, "L'impôt sur les traitements et salaires est un impôt sur le revenu.", "easy"],
+        ["Qu'est-ce que le déficit budgétaire ?", ["Un excès des dépenses sur les recettes", "Un excès des recettes sur les dépenses", "L'égalité entre recettes et dépenses", "Aucun déficit"], 0, "Le déficit budgétaire est un excès des dépenses sur les recettes.", "easy"],
+        ["Qu'est-ce que l'excédent budgétaire ?", ["Un excès des recettes sur les dépenses", "Un excès des dépenses sur les recettes", "L'égalité entre recettes et dépenses", "Aucun excédent"], 0, "L'excédent budgétaire est un excès des recettes sur les dépenses.", "easy"],
+        ["Qu'est-ce que la dette publique ?", ["L'ensemble des montants que l'État doit à ses créanciers", "Les recettes de l'État", "Les dépenses de l'État", "Les investissements de l'État"], 0, "La dette publique est l'ensemble des montants que l'État doit à ses créanciers.", "easy"],
+        ["Qu'est-ce que la politique budgétaire ?", ["L'utilisation des recettes et dépenses publiques pour atteindre des objectifs économiques", "Le contrôle de la masse monétaire", "La fixation du taux de change", "La régulation du commerce"], 0, "La politique budgétaire utilise les recettes et dépenses publiques pour atteindre des objectifs économiques.", "easy"],
+        ["Qu'est-ce que la politique monétaire ?", ["Le contrôle de la masse monétaire et des taux d'intérêt", "L'utilisation des recettes et dépenses", "La régulation du commerce", "La fixation du taux de change"], 0, "La politique monétaire contrôle la masse monétaire et les taux d'intérêt.", "easy"],
+        ["Qu'est-ce que la Banque Centrale ?", ["L'institution responsable de l'émission de la monnaie", "Une banque commerciale", "Une banque d'investissement", "Une banque islamique"], 0, "La Banque Centrale est l'institution responsable de l'émission de la monnaie et de la politique monétaire.", "easy"],
+        ["Qu'est-ce que la Banque Centrale de Mauritanie ?", ["La banque centrale de la Mauritanie", "Une banque commerciale", "Une banque d'investissement", "Une banque islamique"], 0, "La Banque Centrale de Mauritanie est la banque centrale du pays.", "easy"],
+        ["Quelle est la monnaie officielle de la Mauritanie ?", ["L'ouguiya", "Le dirham", "Le dinar", "Le franc"], 0, "La monnaie officielle de la Mauritanie est l'ouguiya.", "easy"],
+        ["Qu'est-ce que le taux de change ?", ["La valeur d'une monnaie par rapport à une autre", "Le prix d'un bien", "Le taux d'intérêt", "Le prix de l'or"], 0, "Le taux de change est la valeur d'une monnaie par rapport à une autre.", "easy"],
+        ["Qu'est-ce que la balance commerciale ?", ["La différence entre les exportations et les importations", "La différence entre les recettes et les dépenses", "La différence entre les actifs et les passifs", "La différence entre les investissements"], 0, "La balance commerciale est la différence entre les exportations et les importations.", "easy"],
+        ["Qu'est-ce que la balance des paiements ?", ["L'enregistrement de toutes les transactions économiques d'un pays avec le reste du monde", "La différence entre les exportations et les importations", "La différence entre les recettes et les dépenses", "La différence entre les actifs et les passifs"], 0, "La balance des paiements enregistre toutes les transactions économiques d'un pays avec le reste du monde.", "easy"],
+        ["Quel est le PIB de la Mauritanie en 2024 ?", ["431 milliards d'ouguiyas", "472 milliards d'ouguiyas", "500 milliards d'ouguiyas", "400 milliards d'ouguiyas"], 0, "Le PIB de la Mauritanie en 2024 est estimé à environ 431 milliards d'ouguiyas.", "easy"],
+        ["Quel est le taux de pression fiscale en Mauritanie ?", ["15,7% du PIB", "20% du PIB", "10% du PIB", "25% du PIB"], 0, "Le taux de pression fiscale en Mauritanie est de 15,7% du PIB.", "easy"],
+        ["Quels sont les principaux secteurs économiques de la Mauritanie ?", ["Pêche, mines, agriculture, commerce", "Industrie uniquement", "Agriculture uniquement", "Commerce uniquement"], 0, "Les principaux secteurs : pêche, mines, agriculture, commerce.", "easy"],
+        ["Quelles sont les principales exportations de la Mauritanie ?", ["Fer, poisson, or, cuivre", "Voitures", "Électronique", "Machines"], 0, "Les principales exportations : fer, poisson, or, cuivre.", "easy"],
+        ["Quelles sont les principales importations de la Mauritanie ?", ["Produits alimentaires, machines, produits pétroliers", "Voitures", "Électronique", "Armes"], 0, "Les principales importations : produits alimentaires, machines, produits pétroliers.", "easy"],
+        ["Quel est le taux de croissance économique en Mauritanie ?", ["Varie d'une année à l'autre selon les secteurs", "Toujours stable", "Aucune croissance", "Croissance négative"], 0, "Le taux de croissance varie d'une année à l'autre selon les secteurs.", "easy"],
+        ["Quel est le rôle de la CNSS dans l'économie ?", ["Protection sociale des travailleurs", "Commerce", "Industrie", "Agriculture"], 0, "Le rôle de la CNSS est la protection sociale des travailleurs.", "easy"],
+        ["Quelle est la contribution de la pêche à l'économie mauritanienne ?", ["Contribution importante au PIB et aux exportations", "Contribution faible", "Aucune contribution", "Contribution secondaire"], 0, "La pêche contribue de manière importante au PIB et aux exportations.", "easy"],
+        ["Quelle est la contribution des mines à l'économie mauritanienne ?", ["Contribution importante au PIB et aux exportations", "Contribution faible", "Aucune contribution", "Contribution secondaire"], 0, "Les mines contribuent de manière importante au PIB et aux exportations.", "easy"],
+        ["Quelle est la contribution de l'agriculture à l'économie mauritanienne ?", ["Contribution moyenne avec un grand nombre d'emplois", "Contribution importante", "Aucune contribution", "Contribution secondaire"], 0, "L'agriculture contribue de manière moyenne au PIB mais emploie un grand nombre de personnes.", "easy"],
+        ["Quelle est la contribution du commerce à l'économie mauritanienne ?", ["Contribution importante au PIB", "Contribution faible", "Aucune contribution", "Contribution secondaire"], 0, "Le commerce contribue de manière importante au PIB.", "easy"],
+        ["Quels sont les principaux défis économiques en Mauritanie ?", ["Chômage, pauvreté, diversification économique", "Aucun défi", "Défis mineurs", "Défis limités"], 0, "Les principaux défis : chômage, pauvreté, diversification économique.", "easy"],
+        ["Qu'est-ce que la Stratégie de Croissance Accélérée et de Prospérité Partagée ?", ["Une stratégie de développement en Mauritanie", "Une stratégie commerciale", "Une stratégie industrielle", "Une stratégie agricole"], 0, "La Stratégie de Croissance Accélérée et de Prospérité Partagée est une stratégie de développement en Mauritanie.", "easy"],
+        ["Quel est le rôle de l'État dans l'économie mauritanienne ?", ["Réguler et orienter l'économie", "Contrôler totalement", "Ne pas intervenir", "Commerce uniquement"], 0, "Le rôle de l'État est de réguler et orienter l'économie.", "easy"],
+        ["Quelle est la politique économique de la Mauritanie ?", ["Encourager l'investissement et la diversification économique", "Dépendre d'un seul secteur", "Ne pas intervenir", "Nationaliser"], 0, "La politique économique encourage l'investissement et la diversification économique.", "easy"],
+        ["Quels sont les principaux partenaires commerciaux de la Mauritanie ?", ["Chine, France, Espagne, Sénégal", "États-Unis uniquement", "Russie uniquement", "Brésil uniquement"], 0, "Les principaux partenaires commerciaux : Chine, France, Espagne, Sénégal.", "easy"],
+        ["Quel est le rôle du secteur privé dans l'économie mauritanienne ?", ["Contribution importante au PIB et à l'emploi", "Contribution faible", "Aucune contribution", "Contribution secondaire"], 0, "Le secteur privé contribue de manière importante au PIB et à l'emploi.", "easy"],
+        ["Quel est le rôle du secteur public dans l'économie mauritanienne ?", ["Régulation et fourniture de services publics", "Commerce uniquement", "Industrie uniquement", "Agriculture uniquement"], 0, "Le rôle du secteur public est la régulation et la fourniture de services publics.", "easy"],
+        ["Qu'est-ce que l'investissement direct étranger en Mauritanie ?", ["Investissements dans les secteurs minier, halieutique et énergétique", "Aucun investissement", "Investissements limités", "Investissements dans un seul secteur"], 0, "L'investissement direct étranger concerne les secteurs minier, halieutique et énergétique.", "easy"],
+        ["Quelle est l'importance de la diversification économique pour la Mauritanie ?", ["Réduire la dépendance à un seul secteur", "Augmenter la dépendance à un seul secteur", "Aucune importance", "Importance secondaire"], 0, "La diversification économique réduit la dépendance à un seul secteur et améliore la stabilité économique.", "easy"],
+        ["Quelle est la relation entre la CNSS et l'économie ?", ["Protection sociale qui contribue à la stabilité économique", "Aucune relation", "Relation secondaire", "Relation limitée"], 0, "La CNSS contribue à la stabilité économique par la protection sociale.", "easy"],
+        ["Quelles sont les sources de financement de la CNSS ?", ["Cotisations sociales des travailleurs et employeurs", "Subventions publiques uniquement", "Dons", "Prêts"], 0, "Les sources de financement : cotisations sociales des travailleurs et employeurs.", "easy"],
+        ["Quel est le rôle des cotisations sociales dans l'économie ?", ["Financer la protection sociale des travailleurs", "Financer le commerce", "Financer l'industrie", "Financer l'agriculture"], 0, "Les cotisations sociales financent la protection sociale des travailleurs.", "easy"],
+        ["Quelle est la relation entre les salaires et les cotisations sociales ?", ["Les cotisations sont calculées sur la base des salaires", "Aucune relation", "Relation inverse", "Relation aléatoire"], 0, "Les cotisations sociales sont calculées sur la base des salaires.", "easy"],
+        ["Quelle est l'importance des statistiques économiques ?", ["Aider à la prise de décisions économiques", "Aucune importance", "Importance secondaire", "Importance limitée"], 0, "Les statistiques économiques aident à la prise de décisions économiques.", "easy"],
+        ["Qu'est-ce que le commerce international ?", ["L'échange de biens et services entre pays", "Le commerce intérieur", "Le commerce électronique", "Le commerce traditionnel"], 0, "Le commerce international est l'échange de biens et services entre pays.", "easy"],
+        ["Qu'est-ce que les exportations ?", ["Les biens et services vendus à l'étranger", "Les biens importés", "Les biens produits localement", "Les biens stockés"], 0, "Les exportations sont les biens et services vendus à l'étranger.", "easy"],
+        ["Qu'est-ce que les importations ?", ["Les biens et services achetés à l'étranger", "Les biens exportés", "Les biens produits localement", "Les biens stockés"], 0, "Les importations sont les biens et services achetés à l'étranger.", "easy"],
+        ["Qu'est-ce qu'une balance commerciale excédentaire ?", ["Un excès des exportations sur les importations", "Un excès des importations sur les exportations", "L'égalité entre exportations et importations", "Aucune balance"], 0, "Une balance commerciale excédentaire est un excès des exportations sur les importations.", "easy"],
+        ["Qu'est-ce qu'une balance commerciale déficitaire ?", ["Un excès des importations sur les exportations", "Un excès des exportations sur les importations", "L'égalité entre exportations et importations", "Aucune balance"], 0, "Une balance commerciale déficitaire est un excès des importations sur les exportations.", "easy"],
+        ["Qu'est-ce que la protection commerciale ?", ["Des politiques pour protéger le producteur local de la concurrence étrangère", "Des politiques pour encourager les importations", "Des politiques pour encourager les exportations", "Des politiques pour libéraliser le commerce"], 0, "La protection commerciale protège le producteur local de la concurrence étrangère.", "easy"],
+        ["Qu'est-ce que les droits de douane ?", ["Des taxes sur les biens importés", "Des taxes sur les exportations", "Des taxes sur le revenu", "Des taxes sur la consommation"], 0, "Les droits de douane sont des taxes sur les biens importés.", "easy"],
+        ["Qu'est-ce que les quotas d'importation ?", ["Une limite quantitative à l'importation", "Une limite quantitative à l'exportation", "Une interdiction d'importer", "Une interdiction d'exporter"], 0, "Les quotas d'importation sont une limite quantitative à l'importation.", "easy"],
+        ["Qu'est-ce que l'Organisation Mondiale du Commerce (OMC) ?", ["Une organisation internationale pour réguler le commerce mondial", "Une organisation commerciale régionale", "Une organisation militaire", "Une organisation culturelle"], 0, "L'OMC est une organisation internationale pour réguler le commerce mondial.", "easy"],
+        ["Qu'est-ce qu'une zone de libre-échange ?", ["Une zone où les droits de douane sont supprimés entre les pays membres", "Une zone commerciale fermée", "Une zone agricole", "Une zone industrielle"], 0, "Une zone de libre-échange est une zone où les droits de douane sont supprimés entre les pays membres.", "easy"],
+        ["Qu'est-ce qu'une union douanière ?", ["Une union qui supprime les droits de douane entre les membres et les unifie vis-à-vis de l'extérieur", "Une union politique", "Une union monétaire", "Une union culturelle"], 0, "Une union douanière supprime les droits de douane entre les membres et les unifie vis-à-vis de l'extérieur.", "easy"],
+        ["Qu'est-ce qu'un marché commun ?", ["Une union avec libre circulation des biens, services, capitaux et travail", "Un marché local", "Un marché régional", "Un marché international"], 0, "Un marché commun inclut la libre circulation des biens, services, capitaux et travail.", "easy"],
+        ["Qu'est-ce qu'une union économique et monétaire ?", ["Une union avec une monnaie commune et des politiques économiques coordonnées", "Une union douanière", "Une zone de libre-échange", "Une union politique"], 0, "Une union économique et monétaire inclut une monnaie commune et des politiques économiques coordonnées.", "easy"],
+        ["Qu'est-ce que l'avantage comparatif ?", ["La capacité d'un pays à produire un bien à un coût relativement inférieur à un autre pays", "La capacité d'un pays à produire tous les biens", "La capacité d'un pays à produire un bien à un coût supérieur", "La capacité d'un pays à produire un bien unique"], 0, "L'avantage comparatif est la capacité d'un pays à produire un bien à un coût relativement inférieur.", "easy"],
+        ["Qu'est-ce que l'avantage absolu ?", ["La capacité d'un pays à produire un bien à un coût absolument inférieur à un autre pays", "La capacité d'un pays à produire tous les biens", "La capacité d'un pays à produire un bien à un coût supérieur", "La capacité d'un pays à produire un bien unique"], 0, "L'avantage absolu est la capacité d'un pays à produire un bien à un coût absolument inférieur.", "easy"],
+        ["Qu'est-ce que les termes de l'échange ?", ["Le rapport des prix des exportations sur les prix des importations", "Le rapport des exportations sur les importations", "Le rapport des recettes sur les dépenses", "Le rapport des actifs sur les passifs"], 0, "Les termes de l'échange sont le rapport des prix des exportations sur les prix des importations.", "easy"],
+        ["Qu'est-ce qu'un taux de change fixe ?", ["Un taux de change fixé par l'État", "Un taux de change fixé par le marché", "Un taux de change variable", "Un taux de change aléatoire"], 0, "Un taux de change fixe est fixé par l'État.", "easy"],
+        ["Qu'est-ce qu'un taux de change flottant ?", ["Un taux de change fixé par le marché", "Un taux de change fixé par l'État", "Un taux de change fixe", "Un taux de change aléatoire"], 0, "Un taux de change flottant est fixé par le marché.", "easy"],
+        ["Qu'est-ce qu'un taux de change administré ?", ["Un taux de change où la Banque Centrale intervient", "Un taux de change fixe", "Un taux de change flottant", "Un taux de change aléatoire"], 0, "Un taux de change administré est un taux de change où la Banque Centrale intervient.", "easy"],
+        ["Qu'est-ce que la balance des paiements ?", ["Un registre des transactions économiques entre un pays et le monde", "Un registre des exportations", "Un registre des importations", "Un registre des investissements"], 0, "La balance des paiements est un registre des transactions économiques entre un pays et le monde.", "easy"],
+        ["Qu'est-ce que le compte courant de la balance des paiements ?", ["Un registre des exportations, importations et transferts", "Un registre des investissements", "Un registre des dettes", "Un registre des réserves"], 0, "Le compte courant enregistre les exportations, importations et transferts.", "easy"],
+        ["Qu'est-ce que le compte de capital de la balance des paiements ?", ["Un registre des investissements et dettes", "Un registre des exportations", "Un registre des importations", "Un registre des transferts"], 0, "Le compte de capital enregistre les investissements et les dettes.", "easy"],
+        ["Qu'est-ce que les réserves de change ?", ["Des actifs étrangers détenus par la Banque Centrale", "Des actifs locaux", "Des dettes", "Des investissements"], 0, "Les réserves de change sont des actifs étrangers détenus par la Banque Centrale.", "easy"],
+        ["Qu'est-ce que la mondialisation ?", ["L'intégration économique, culturelle et politique entre les pays", "L'isolement économique", "La protection commerciale", "La fermeture économique"], 0, "La mondialisation est l'intégration économique, culturelle et politique entre les pays.", "easy"],
+        ["Quels sont les effets de la mondialisation sur l'économie mauritanienne ?", ["Opportunités et défis", "Opportunités uniquement", "Défis uniquement", "Aucun effet"], 0, "La mondialisation offre des opportunités et des défis à l'économie mauritanienne.", "easy"],
+
+        // ---------- MOYENNES (100) ----------
+        ["Qu'est-ce que la fonction de demande ?", ["Une relation mathématique entre la quantité demandée et le prix", "Une relation entre l'offre et la demande", "Une relation entre le revenu et la consommation", "Une relation entre le prix et la qualité"], 0, "La fonction de demande est une relation mathématique entre la quantité demandée et le prix.", "medium"],
+        ["Qu'est-ce que la fonction d'offre ?", ["Une relation mathématique entre la quantité offerte et le prix", "Une relation entre l'offre et la demande", "Une relation entre le coût et le prix", "Une relation entre le prix et la qualité"], 0, "La fonction d'offre est une relation mathématique entre la quantité offerte et le prix.", "medium"],
+        ["Qu'est-ce que l'élasticité-revenu de la demande ?", ["La mesure de la réaction de la demande à une variation du revenu", "La mesure de la réaction de la demande au prix", "La mesure de la réaction de l'offre", "La mesure de la réaction de la qualité"], 0, "L'élasticité-revenu mesure la réaction de la demande à une variation du revenu.", "medium"],
+        ["Qu'est-ce que l'élasticité croisée de la demande ?", ["La mesure de la réaction de la demande d'un bien à une variation du prix d'un autre bien", "La mesure de la réaction de la demande au prix", "La mesure de la réaction de l'offre", "La mesure de la réaction du revenu"], 0, "L'élasticité croisée mesure la réaction de la demande d'un bien à une variation du prix d'un autre bien.", "medium"],
+        ["Qu'est-ce que les biens substituts ?", ["Des biens qui peuvent se remplacer mutuellement", "Des biens complémentaires", "Des biens indépendants", "Des biens de luxe"], 0, "Les biens substituts sont des biens qui peuvent se remplacer mutuellement.", "medium"],
+        ["Qu'est-ce que les biens complémentaires ?", ["Des biens utilisés ensemble", "Des biens substituts", "Des biens indépendants", "Des biens de luxe"], 0, "Les biens complémentaires sont des biens utilisés ensemble.", "medium"],
+        ["Qu'est-ce que les biens normaux ?", ["Des biens dont la demande augmente avec le revenu", "Des biens dont la demande diminue avec le revenu", "Des biens dont la demande n'est pas affectée par le revenu", "Des biens de luxe"], 0, "Les biens normaux sont des biens dont la demande augmente avec le revenu.", "medium"],
+        ["Qu'est-ce que les biens inférieurs ?", ["Des biens dont la demande diminue avec le revenu", "Des biens dont la demande augmente avec le revenu", "Des biens dont la demande n'est pas affectée par le revenu", "Des biens de luxe"], 0, "Les biens inférieurs sont des biens dont la demande diminue avec le revenu.", "medium"],
+        ["Qu'est-ce que les biens de luxe ?", ["Des biens dont la demande augmente fortement avec le revenu", "Des biens dont la demande diminue avec le revenu", "Des biens normaux", "Des biens inférieurs"], 0, "Les biens de luxe sont des biens dont la demande augmente fortement avec le revenu.", "medium"],
+        ["Qu'est-ce que le surplus du consommateur ?", ["La différence entre ce que le consommateur est prêt à payer et ce qu'il paie réellement", "La différence entre le prix et le coût", "Le profit", "La perte"], 0, "Le surplus du consommateur est la différence entre ce qu'il est prêt à payer et ce qu'il paie réellement.", "medium"],
+        ["Qu'est-ce que le surplus du producteur ?", ["La différence entre le prix que le producteur accepte et le prix réel", "La différence entre le revenu et le coût", "Le profit net", "La perte"], 0, "Le surplus du producteur est la différence entre le prix qu'il accepte et le prix réel.", "medium"],
+        ["Qu'est-ce que le coût total ?", ["La somme des coûts fixes et variables", "Les coûts fixes uniquement", "Les coûts variables uniquement", "Le coût marginal"], 0, "Le coût total est la somme des coûts fixes et variables.", "medium"],
+        ["Qu'est-ce que le coût fixe ?", ["Un coût qui ne varie pas avec la production", "Un coût qui varie avec la production", "Un coût variable", "Un coût marginal"], 0, "Le coût fixe est un coût qui ne varie pas avec la production.", "medium"],
+        ["Qu'est-ce que le coût variable ?", ["Un coût qui varie avec la production", "Un coût fixe", "Un coût total", "Un coût marginal"], 0, "Le coût variable est un coût qui varie avec la production.", "medium"],
+        ["Qu'est-ce que le coût marginal ?", ["Le coût de production d'une unité supplémentaire", "Le coût de production de toutes les unités", "Le coût fixe", "Le coût variable"], 0, "Le coût marginal est le coût de production d'une unité supplémentaire.", "medium"],
+        ["Qu'est-ce que le coût moyen ?", ["Le coût total divisé par le nombre d'unités", "Le coût marginal", "Le coût fixe", "Le coût variable"], 0, "Le coût moyen est le coût total divisé par le nombre d'unités.", "medium"],
+        ["Qu'est-ce que le revenu total ?", ["Le prix multiplié par la quantité vendue", "Le coût total", "Le profit", "La perte"], 0, "Le revenu total est le prix multiplié par la quantité vendue.", "medium"],
+        ["Qu'est-ce que le revenu marginal ?", ["Le revenu de la vente d'une unité supplémentaire", "Le revenu total", "Le profit", "La perte"], 0, "Le revenu marginal est le revenu de la vente d'une unité supplémentaire.", "medium"],
+        ["Qu'est-ce que le profit ?", ["La différence entre le revenu total et le coût total", "Le revenu total", "Le coût total", "La perte"], 0, "Le profit est la différence entre le revenu total et le coût total.", "medium"],
+        ["Qu'est-ce que le seuil de rentabilité ?", ["Le point où le revenu total égale le coût total", "Le point de profit maximum", "Le point de perte maximum", "Le point d'équilibre"], 0, "Le seuil de rentabilité est le point où le revenu total égale le coût total.", "medium"],
+        ["Qu'est-ce que l'équilibre en concurrence pure et parfaite ?", ["Quand le prix égale le coût marginal", "Quand le prix égale le coût moyen", "Quand le revenu égale le coût", "Quand l'offre égale la demande"], 0, "L'équilibre en concurrence pure et parfaite est quand le prix égale le coût marginal.", "medium"],
+        ["Qu'est-ce que l'équilibre en monopole ?", ["Quand le revenu marginal égale le coût marginal", "Quand le prix égale le coût marginal", "Quand le revenu égale le coût", "Quand l'offre égale la demande"], 0, "L'équilibre en monopole est quand le revenu marginal égale le coût marginal.", "medium"],
+        ["Qu'est-ce que l'efficacité économique ?", ["Produire le maximum avec le minimum de coûts", "Maximiser le profit", "Maximiser le revenu", "Minimiser les coûts"], 0, "L'efficacité économique est produire le maximum avec le minimum de coûts.", "medium"],
+        ["Qu'est-ce que la justice économique ?", ["Une distribution équitable des ressources et des revenus", "Maximiser le profit", "Maximiser la production", "Minimiser les coûts"], 0, "La justice économique est une distribution équitable des ressources et des revenus.", "medium"],
+        ["Qu'est-ce que la défaillance du marché ?", ["L'incapacité du marché à atteindre l'efficacité économique", "Le succès du marché", "L'équilibre du marché", "La stabilité du marché"], 0, "La défaillance du marché est l'incapacité du marché à atteindre l'efficacité économique.", "medium"],
+        ["Quelles sont les composantes du PIB ?", ["Consommation, investissement, dépenses publiques, exportations nettes", "Consommation uniquement", "Investissement uniquement", "Exportations uniquement"], 0, "Les composantes du PIB : consommation, investissement, dépenses publiques, exportations nettes.", "medium"],
+        ["Quelle est la différence entre le PIB et le PNB ?", ["Le PNB inclut les revenus des nationaux à l'étranger", "Aucune différence", "Le PIB inclut les revenus des étrangers", "Le PNB n'inclut pas les revenus des nationaux"], 0, "Le PNB inclut les revenus des nationaux à l'étranger, tandis que le PIB inclut la production à l'intérieur du pays.", "medium"],
+        ["Qu'est-ce que le revenu national disponible ?", ["Le revenu disponible pour la consommation et l'épargne", "Le revenu brut", "Le revenu net", "Le revenu national"], 0, "Le revenu national disponible est le revenu disponible pour la consommation et l'épargne après impôts.", "medium"],
+        ["Qu'est-ce que la consommation ?", ["Les dépenses des ménages en biens et services", "Les dépenses des entreprises", "Les dépenses de l'État", "Les exportations"], 0, "La consommation est les dépenses des ménages en biens et services.", "medium"],
+        ["Qu'est-ce que l'investissement ?", ["Les dépenses des entreprises en capital", "Les dépenses des ménages", "Les dépenses de l'État", "Les exportations"], 0, "L'investissement est les dépenses des entreprises en capital.", "medium"],
+        ["Qu'est-ce que les dépenses publiques ?", ["Les dépenses de l'État en biens et services", "Les dépenses des ménages", "Les dépenses des entreprises", "Les exportations"], 0, "Les dépenses publiques sont les dépenses de l'État en biens et services.", "medium"],
+        ["Qu'est-ce que les multiplicateurs économiques ?", ["L'effet d'une variation des dépenses sur la production plus que proportionnellement", "Un effet constant", "Un effet inverse", "Aucun effet"], 0, "Les multiplicateurs économiques sont l'effet d'une variation des dépenses sur la production plus que proportionnellement.", "medium"],
+        ["Qu'est-ce que le taux de croissance économique ?", ["Le pourcentage de variation du PIB", "Le taux d'inflation", "Le taux de chômage", "Le taux d'intérêt"], 0, "Le taux de croissance économique est le pourcentage de variation du PIB.", "medium"],
+        ["Quelles sont les causes de l'inflation ?", ["Inflation par la demande, par les coûts, monétaire", "Inflation par la demande uniquement", "Inflation par les coûts uniquement", "Inflation monétaire uniquement"], 0, "Les causes de l'inflation : par la demande, par les coûts, monétaire.", "medium"],
+        ["Quels sont les effets de l'inflation ?", ["Baisse du pouvoir d'achat, redistribution des revenus", "Hausse du pouvoir d'achat", "Amélioration des revenus", "Stabilité des prix"], 0, "Les effets de l'inflation : baisse du pouvoir d'achat, redistribution des revenus.", "medium"],
+        ["Qu'est-ce que l'hyperinflation ?", ["Une inflation très élevée et incontrôlée", "Une inflation faible", "Une inflation modérée", "Une déflation"], 0, "L'hyperinflation est une inflation très élevée et incontrôlée.", "medium"],
+        ["Qu'est-ce que la stagflation ?", ["Une inflation avec une récession économique", "Une inflation uniquement", "Une récession uniquement", "Une déflation"], 0, "La stagflation est une inflation avec une récession économique.", "medium"],
+        ["Qu'est-ce que la politique d'austérité ?", ["Réduire les dépenses publiques pour faire face au déficit", "Augmenter les dépenses", "Augmenter les impôts", "Augmenter les dettes"], 0, "La politique d'austérité réduit les dépenses publiques pour faire face au déficit.", "medium"],
+        ["Qu'est-ce que la politique expansionniste ?", ["Augmenter les dépenses publiques pour stimuler l'économie", "Réduire les dépenses", "Augmenter les impôts", "Réduire les dettes"], 0, "La politique expansionniste augmente les dépenses publiques pour stimuler l'économie.", "medium"],
+        ["Quels sont les instruments de la politique monétaire ?", ["Taux d'intérêt, réserves obligatoires, opérations d'open market", "Taux d'intérêt uniquement", "Réserves obligatoires uniquement", "Opérations d'open market uniquement"], 0, "Les instruments de la politique monétaire : taux d'intérêt, réserves obligatoires, opérations d'open market.", "medium"],
+        ["Qu'est-ce que le taux d'intérêt ?", ["Le coût de l'emprunt", "Le prix du bien", "Le taux de change", "Le prix de l'or"], 0, "Le taux d'intérêt est le coût de l'emprunt.", "medium"],
+        ["Qu'est-ce que les réserves obligatoires ?", ["Un pourcentage des dépôts que les banques doivent conserver", "Un pourcentage des profits", "Un pourcentage des investissements", "Un pourcentage des prêts"], 0, "Les réserves obligatoires sont un pourcentage des dépôts que les banques doivent conserver.", "medium"],
+        ["Qu'est-ce que les opérations d'open market ?", ["L'achat et la vente de titres par la Banque Centrale", "L'achat et la vente de biens", "L'achat et la vente de devises", "L'achat et la vente d'actions"], 0, "Les opérations d'open market sont l'achat et la vente de titres par la Banque Centrale.", "medium"],
+        ["Qu'est-ce que la masse monétaire ?", ["L'ensemble de la monnaie en circulation dans l'économie", "L'ensemble des dépôts", "L'ensemble des prêts", "L'ensemble des investissements"], 0, "La masse monétaire est l'ensemble de la monnaie en circulation dans l'économie.", "medium"],
+        ["Quels sont les types de masse monétaire ?", ["M1, M2, M3", "M1 uniquement", "M2 uniquement", "M3 uniquement"], 0, "Les types de masse monétaire : M1 (monnaie en circulation), M2 (M1 + dépôts), M3 (M2 + dépôts à terme).", "medium"],
+        ["Qu'est-ce que l'équation des échanges ?", ["MV = PT", "M = V", "P = T", "V = T"], 0, "L'équation des échanges : MV = PT (monnaie × vitesse = prix × transactions).", "medium"],
+        ["Qu'est-ce que le chômage conjoncturel ?", ["Un chômage dû à la récession économique", "Un chômage structurel", "Un chômage frictionnel", "Un chômage saisonnier"], 0, "Le chômage conjoncturel est un chômage dû à la récession économique.", "medium"],
+        ["Qu'est-ce que le chômage structurel ?", ["Un chômage dû à des changements structurels dans l'économie", "Un chômage conjoncturel", "Un chômage frictionnel", "Un chômage saisonnier"], 0, "Le chômage structurel est un chômage dû à des changements structurels dans l'économie.", "medium"],
+        ["Qu'est-ce que le chômage frictionnel ?", ["Un chômage temporaire pendant la recherche d'emploi", "Un chômage conjoncturel", "Un chômage structurel", "Un chômage saisonnier"], 0, "Le chômage frictionnel est un chômage temporaire pendant la recherche d'emploi.", "medium"],
+        ["Qu'est-ce que le chômage saisonnier ?", ["Un chômage lié aux saisons", "Un chômage conjoncturel", "Un chômage structurel", "Un chômage frictionnel"], 0, "Le chômage saisonnier est un chômage lié aux saisons.", "medium"],
+        ["Quelle est la structure de l'économie mauritanienne ?", ["Une économie basée sur la pêche, les mines et l'agriculture", "Une économie industrielle", "Une économie purement agricole", "Une économie purement commerciale"], 0, "La structure de l'économie mauritanienne : basée sur la pêche, les mines et l'agriculture.", "medium"],
+        ["Quelle est la part des mines dans le PIB ?", ["Une part importante entre 20-30%", "Une part faible", "Aucune part", "Une part secondaire"], 0, "La part des mines dans le PIB est importante, entre 20-30%.", "medium"],
+        ["Quelle est la part de la pêche dans le PIB ?", ["Une part moyenne entre 5-10%", "Une part importante", "Aucune part", "Une part secondaire"], 0, "La part de la pêche dans le PIB est moyenne.", "medium"],
+        ["Quelle est la part de l'agriculture dans le PIB ?", ["Une part moyenne avec un grand nombre d'emplois", "Une part importante", "Aucune part", "Une part secondaire"], 0, "L'agriculture contribue à une part moyenne du PIB mais emploie un grand nombre de personnes.", "medium"],
+        ["Quels sont les principaux défis économiques en Mauritanie ?", ["Diversification économique, chômage, pauvreté", "Aucun défi", "Défis mineurs", "Défis limités"], 0, "Les principaux défis : diversification économique, chômage, pauvreté.", "medium"],
+        ["Qu'est-ce que la Stratégie de Croissance Accélérée et de Prospérité Partagée ?", ["Une stratégie de développement globale en Mauritanie", "Une stratégie sectorielle", "Une stratégie temporaire", "Une stratégie locale"], 0, "La Stratégie de Croissance Accélérée et de Prospérité Partagée est une stratégie de développement globale.", "medium"],
+        ["Quels sont les objectifs de la Stratégie de Croissance Accélérée et de Prospérité Partagée ?", ["Croissance économique rapide et amélioration du niveau de vie", "Augmenter les exportations", "Augmenter les importations", "Augmenter les impôts"], 0, "Les objectifs : croissance économique rapide et amélioration du niveau de vie.", "medium"],
+        ["Quels sont les axes de la Stratégie de Croissance Accélérée et de Prospérité Partagée ?", ["Agriculture, pêche, mines, tourisme, infrastructures", "Agriculture uniquement", "Pêche uniquement", "Mines uniquement"], 0, "Les axes : agriculture, pêche, mines, tourisme, infrastructures.", "medium"],
+        ["Quel est le rôle du secteur privé dans la stratégie ?", ["Partenaire essentiel du développement", "Rôle secondaire", "Aucun rôle", "Rôle limité"], 0, "Le secteur privé est un partenaire essentiel du développement.", "medium"],
+        ["Quel est le rôle du secteur public dans la stratégie ?", ["Régulation, orientation et fourniture d'infrastructures", "Rôle commercial", "Aucun rôle", "Rôle limité"], 0, "Le rôle du secteur public : régulation, orientation et fourniture d'infrastructures.", "medium"],
+        ["Quel est le rôle de la CNSS dans la stratégie ?", ["Protection sociale des citoyens", "Rôle commercial", "Aucun rôle", "Rôle limité"], 0, "Le rôle de la CNSS est la protection sociale des citoyens.", "medium"],
+        ["Quelle est l'importance de la protection sociale dans le développement ?", ["Stabilité sociale et économique", "Aucune importance", "Importance secondaire", "Importance limitée"], 0, "La protection sociale contribue à la stabilité sociale et économique.", "medium"],
+        ["Quelles sont les composantes du système de protection sociale en Mauritanie ?", ["Sécurité sociale, assistance sociale, assurance maladie", "Sécurité sociale uniquement", "Assistance sociale uniquement", "Assurance maladie uniquement"], 0, "Les composantes : sécurité sociale, assistance sociale, assurance maladie.", "medium"],
+        ["Quel est le rôle de l'État dans la protection sociale ?", ["Régulation et financement des programmes de protection sociale", "Aucun rôle", "Rôle secondaire", "Rôle limité"], 0, "Le rôle de l'État est la régulation et le financement des programmes de protection sociale.", "medium"],
+        ["Quel est le rôle du secteur privé dans la protection sociale ?", ["Participation au financement et à la mise en œuvre", "Aucun rôle", "Rôle secondaire", "Rôle limité"], 0, "Le secteur privé participe au financement et à la mise en œuvre des programmes de protection sociale.", "medium"],
+        ["Quelle est la relation entre croissance économique et développement ?", ["La croissance est une condition nécessaire mais non suffisante du développement", "Aucune relation", "La croissance suffit au développement", "Le développement suffit à la croissance"], 0, "La croissance économique est une condition nécessaire mais non suffisante du développement.", "medium"],
+        ["Quels sont les indicateurs de développement ?", ["Indice de développement humain, indice de pauvreté, indice d'inégalité", "Un seul indicateur", "Deux indicateurs", "Aucun indicateur"], 0, "Les indicateurs de développement : IDH, indice de pauvreté, indice d'inégalité.", "medium"],
+        ["Qu'est-ce que l'Indice de Développement Humain (IDH) ?", ["Un indice qui mesure le développement par la santé, l'éducation et le revenu", "Un indice économique uniquement", "Un indice de santé uniquement", "Un indice d'éducation uniquement"], 0, "L'IDH mesure le développement par la santé, l'éducation et le revenu.", "medium"],
+        ["Qu'est-ce que l'indice de pauvreté ?", ["Un indice qui mesure le pourcentage de la population sous le seuil de pauvreté", "Un indice économique", "Un indice de santé", "Un indice d'éducation"], 0, "L'indice de pauvreté mesure le pourcentage de la population sous le seuil de pauvreté.", "medium"],
+        ["Qu'est-ce que le seuil de pauvreté ?", ["Le revenu minimum pour satisfaire les besoins essentiels", "Le revenu maximum", "Le revenu moyen", "Le revenu national"], 0, "Le seuil de pauvreté est le revenu minimum pour satisfaire les besoins essentiels.", "medium"],
+        ["Qu'est-ce que l'indice de Gini ?", ["Un indice qui mesure l'inégalité de la distribution des revenus", "Un indice économique", "Un indice de santé", "Un indice d'éducation"], 0, "L'indice de Gini mesure l'inégalité de la distribution des revenus.", "medium"],
+        ["Qu'est-ce que le développement durable ?", ["Un développement qui satisfait les besoins présents sans compromettre ceux des générations futures", "Un développement économique uniquement", "Un développement social uniquement", "Un développement environnemental uniquement"], 0, "Le développement durable satisfait les besoins présents sans compromettre ceux des générations futures.", "medium"],
+        ["Quels sont les Objectifs de Développement Durable (ODD) ?", ["17 objectifs adoptés par l'ONU", "5 objectifs", "10 objectifs", "20 objectifs"], 0, "Les ODD sont 17 objectifs adoptés par l'ONU.", "medium"],
+        ["Quelle est la relation entre l'économie et l'environnement ?", ["L'économie affecte l'environnement et l'environnement affecte l'économie", "Aucune relation", "Relation unidirectionnelle", "Relation aléatoire"], 0, "L'économie affecte l'environnement et l'environnement affecte l'économie.", "medium"],
+        ["Qu'est-ce que l'économie verte ?", ["Une économie qui concilie développement et préservation de l'environnement", "Une économie agricole", "Une économie industrielle", "Une économie commerciale"], 0, "L'économie verte concilie développement et préservation de l'environnement.", "medium"],
+        ["Quels sont les instruments de la politique budgétaire ?", ["Impôts, dépenses publiques, dette publique", "Impôts uniquement", "Dépenses uniquement", "Dette uniquement"], 0, "Les instruments de la politique budgétaire : impôts, dépenses publiques, dette publique.", "medium"],
+        ["Qu'est-ce que la politique fiscale ?", ["L'utilisation des impôts pour atteindre des objectifs économiques et sociaux", "L'imposition uniquement", "L'abolition des impôts", "L'augmentation des impôts"], 0, "La politique fiscale utilise les impôts pour atteindre des objectifs économiques et sociaux.", "medium"],
+        ["Qu'est-ce que la politique de dépenses ?", ["L'utilisation des dépenses publiques pour atteindre des objectifs économiques", "La réduction des dépenses uniquement", "L'augmentation des dépenses uniquement", "La stabilisation des dépenses"], 0, "La politique de dépenses utilise les dépenses publiques pour atteindre des objectifs économiques.", "medium"],
+        ["Qu'est-ce que la politique de la dette publique ?", ["La gestion de la dette publique pour atteindre des objectifs économiques", "L'emprunt uniquement", "Le remboursement uniquement", "L'augmentation de la dette"], 0, "La politique de la dette publique gère la dette publique pour atteindre des objectifs économiques.", "medium"],
+        ["Qu'est-ce que le double déficit ?", ["Déficit budgétaire avec déficit commercial", "Un seul déficit", "Double excédent", "Double équilibre"], 0, "Le double déficit est un déficit budgétaire avec un déficit commercial.", "medium"],
+        ["Quels sont les effets du déficit sur l'économie ?", ["Hausse de la dette, inflation, baisse de l'investissement", "Hausse de l'investissement", "Baisse de l'inflation", "Stabilité économique"], 0, "Les effets du déficit : hausse de la dette, inflation, baisse de l'investissement.", "medium"],
+        ["Quels sont les modes de financement du déficit ?", ["Emprunt intérieur, emprunt extérieur, émission de monnaie", "Emprunt intérieur uniquement", "Emprunt extérieur uniquement", "Émission de monnaie uniquement"], 0, "Les modes de financement du déficit : emprunt intérieur, emprunt extérieur, émission de monnaie.", "medium"],
+        ["Qu'est-ce que la dette intérieure ?", ["La dette due aux résidents du pays", "La dette extérieure", "La dette publique", "La dette privée"], 0, "La dette intérieure est la dette due aux résidents du pays.", "medium"],
+        ["Qu'est-ce que la dette extérieure ?", ["La dette due aux résidents de l'étranger", "La dette intérieure", "La dette publique", "La dette privée"], 0, "La dette extérieure est la dette due aux résidents de l'étranger.", "medium"],
+        ["Quels sont les risques de la dette extérieure ?", ["Hausse du service de la dette, fluctuations du taux de change", "Aucun risque", "Risques mineurs", "Risques limités"], 0, "Les risques de la dette extérieure : hausse du service de la dette, fluctuations du taux de change.", "medium"],
+        ["Qu'est-ce que la restructuration de la dette ?", ["Renégocier les termes de la dette", "Annuler la dette", "Augmenter la dette", "Reporter la dette"], 0, "La restructuration de la dette est renégocier les termes de la dette.", "medium"],
+        ["Qu'est-ce que l'allègement de la dette ?", ["Annuler une partie ou la totalité de la dette", "Reporter la dette", "Restructurer la dette", "Augmenter la dette"], 0, "L'allègement de la dette est annuler une partie ou la totalité de la dette.", "medium"],
+        ["Qu'est-ce que le Fonds Monétaire International (FMI) ?", ["Une organisation internationale de coopération monétaire et financière", "Une organisation commerciale", "Une organisation militaire", "Une organisation culturelle"], 0, "Le FMI est une organisation internationale de coopération monétaire et financière.", "medium"],
+        ["Qu'est-ce que la Banque Mondiale ?", ["Une organisation internationale de financement du développement", "Une organisation commerciale", "Une organisation monétaire", "Une organisation culturelle"], 0, "La Banque Mondiale est une organisation internationale de financement du développement.", "medium"],
+        ["Quelles sont les conditions du FMI pour les prêts ?", ["Réformes économiques et financières", "Aucune condition", "Conditions politiques", "Conditions militaires"], 0, "Les conditions du FMI pour les prêts : réformes économiques et financières.", "medium"],
+        ["Qu'est-ce que les programmes d'ajustement structurel ?", ["Des programmes de réforme économique conditionnés par les institutions financières internationales", "Des programmes sociaux", "Des programmes éducatifs", "Des programmes de santé"], 0, "Les programmes d'ajustement structurel sont des programmes de réforme économique conditionnés par les IFI.", "medium"],
+        ["Quels sont les effets des programmes d'ajustement structurel ?", ["Réformes économiques avec des effets sociaux", "Aucun effet", "Effets positifs uniquement", "Effets négatifs uniquement"], 0, "Les effets des programmes d'ajustement structurel : réformes économiques avec des effets sociaux.", "medium"],
+        ["Qu'est-ce que le partenariat public-privé ?", ["Une coopération entre l'État et le secteur privé pour réaliser des projets", "Une privatisation", "Une nationalisation", "Une concurrence"], 0, "Le partenariat public-privé est une coopération pour réaliser des projets.", "medium"],
+        ["Qu'est-ce que la privatisation ?", ["La vente d'entreprises publiques au secteur privé", "La nationalisation", "La création d'entreprises publiques", "Le soutien aux entreprises publiques"], 0, "La privatisation est la vente d'entreprises publiques au secteur privé.", "medium"],
+        ["Quels sont les effets de la privatisation ?", ["Augmentation de l'efficacité avec des effets sociaux potentiels", "Aucun effet", "Effets positifs uniquement", "Effets négatifs uniquement"], 0, "Les effets de la privatisation : augmentation de l'efficacité avec des effets sociaux potentiels.", "medium"],
+        ["Quelles sont les perspectives de l'économie mauritanienne ?", ["Opportunités et défis dans le cadre de la diversification économique", "Aucune perspective", "Perspectives limitées", "Perspectives négatives"], 0, "Les perspectives : opportunités et défis dans le cadre de la diversification économique.", "medium"],
+        ["Quels sont les secteurs prometteurs en Mauritanie ?", ["Énergie, tourisme, agriculture, élevage", "Industrie uniquement", "Commerce uniquement", "Services uniquement"], 0, "Les secteurs prometteurs : énergie, tourisme, agriculture, élevage.", "medium"],
+        ["Quel est le rôle de l'énergie dans l'économie mauritanienne ?", ["Un secteur prometteur avec les découvertes de gaz", "Aucun rôle", "Rôle secondaire", "Rôle limité"], 0, "L'énergie est un secteur prometteur avec les découvertes de gaz (champ Grand Tortue Ahmeyim).", "medium"],
+        ["Quel est le rôle du tourisme dans l'économie mauritanienne ?", ["Un secteur prometteur avec un fort potentiel", "Aucun rôle", "Rôle secondaire", "Rôle limité"], 0, "Le tourisme est un secteur prometteur avec un fort potentiel.", "medium"],
+        ["Quel est le rôle de la CNSS dans le développement ?", ["Protection sociale contribuant au développement durable", "Aucun rôle", "Rôle secondaire", "Rôle limité"], 0, "La CNSS contribue au développement durable par la protection sociale.", "medium"],
+
+        // ---------- DIFFICILES (100) ----------
+        ["Qu'est-ce que l'équilibre général ?", ["L'équilibre sur tous les marchés simultanément", "L'équilibre sur un marché", "L'équilibre partiel", "L'équilibre global"], 0, "L'équilibre général est l'équilibre sur tous les marchés simultanément.", "hard"],
+        ["Qu'est-ce que la fonction de production ?", ["Une relation entre les intrants et les extrants", "Une relation entre l'offre et la demande", "Une relation entre le prix et la quantité", "Une relation entre le revenu et la consommation"], 0, "La fonction de production est une relation entre les intrants et les extrants.", "hard"],
+        ["Qu'est-ce que l'élasticité de la production ?", ["La mesure de la réaction de la production à une variation des intrants", "La mesure de la réaction de la demande", "La mesure de la réaction de l'offre", "La mesure de la réaction du prix"], 0, "L'élasticité de la production mesure la réaction de la production à une variation des intrants.", "hard"],
+        ["Qu'est-ce que les rendements d'échelle ?", ["La réaction de la production à une variation de tous les intrants dans la même proportion", "La réaction de la production à une variation d'un intrant", "La réaction de la production au prix", "La réaction de la production à la demande"], 0, "Les rendements d'échelle mesurent la réaction de la production à une variation de tous les intrants dans la même proportion.", "hard"],
+        ["Qu'est-ce que les rendements d'échelle croissants ?", ["Augmentation de la production plus que proportionnellement à l'augmentation des intrants", "Diminution de la production", "Stabilité de la production", "Augmentation de la production proportionnellement"], 0, "Les rendements d'échelle croissants : augmentation de la production plus que proportionnellement à l'augmentation des intrants.", "hard"],
+        ["Qu'est-ce que les rendements d'échelle constants ?", ["Augmentation de la production proportionnellement à l'augmentation des intrants", "Augmentation plus que proportionnelle", "Diminution de la production", "Stabilité de la production"], 0, "Les rendements d'échelle constants : augmentation de la production proportionnellement à l'augmentation des intrants.", "hard"],
+        ["Qu'est-ce que les rendements d'échelle décroissants ?", ["Augmentation de la production moins que proportionnellement à l'augmentation des intrants", "Augmentation plus que proportionnelle", "Diminution de la production", "Stabilité de la production"], 0, "Les rendements d'échelle décroissants : augmentation de la production moins que proportionnellement à l'augmentation des intrants.", "hard"],
+        ["Qu'est-ce que les courbes d'indifférence ?", ["Des courbes représentant des combinaisons de biens donnant la même utilité", "Des courbes de demande", "Des courbes d'offre", "Des courbes de coût"], 0, "Les courbes d'indifférence représentent des combinaisons de biens donnant la même utilité.", "hard"],
+        ["Qu'est-ce que le taux marginal de substitution ?", ["Le taux auquel un bien peut être substitué à un autre en maintenant l'utilité", "Le taux de substitution des biens dans la production", "Le taux de substitution des intrants", "Le taux de substitution des prix"], 0, "Le taux marginal de substitution est le taux auquel un bien peut être substitué à un autre en maintenant l'utilité.", "hard"],
+        ["Qu'est-ce que la droite de budget ?", ["Une droite montrant les combinaisons possibles de biens dans les limites du revenu", "La droite de production", "La droite de demande", "La droite d'offre"], 0, "La droite de budget montre les combinaisons possibles de biens dans les limites du revenu.", "hard"],
+        ["Qu'est-ce que l'équilibre du consommateur ?", ["Le point où le consommateur maximise son utilité", "Le point mort", "Le point de profit maximum", "Le point de perte"], 0, "L'équilibre du consommateur est le point où il maximise son utilité.", "hard"],
+        ["Qu'est-ce que les courbes de coût ?", ["Des courbes représentant la relation entre le coût et la production", "Des courbes de demande", "Des courbes d'offre", "Des courbes d'indifférence"], 0, "Les courbes de coût représentent la relation entre le coût et la production.", "hard"],
+        ["Qu'est-ce que l'équilibre en concurrence monopolistique ?", ["Quand le revenu marginal égale le coût marginal", "Quand le prix égale le coût marginal", "Quand le revenu égale le coût", "Quand l'offre égale la demande"], 0, "L'équilibre en concurrence monopolistique est quand le revenu marginal égale le coût marginal.", "hard"],
+        ["Qu'est-ce que la concurrence monopolistique ?", ["Un marché avec un grand nombre de producteurs avec différenciation des produits", "Un marché de monopole", "Un marché de concurrence pure", "Un marché d'oligopole"], 0, "La concurrence monopolistique est un marché avec un grand nombre de producteurs avec différenciation des produits.", "hard"],
+        ["Qu'est-ce que la discrimination par les prix ?", ["Vendre le même bien à des prix différents à des groupes différents", "Vendre des biens différents à des prix différents", "Vendre le même bien au même prix", "Vendre les biens au prix coûtant"], 0, "La discrimination par les prix est vendre le même bien à des prix différents à des groupes différents.", "hard"],
+        ["Qu'est-ce que le monopole naturel ?", ["Un monopole résultant de la nature de l'industrie", "Un monopole légal", "Un monopole public", "Un monopole temporaire"], 0, "Le monopole naturel est un monopole résultant de la nature de l'industrie (électricité, eau).", "hard"],
+        ["Qu'est-ce que le monopole légal ?", ["Un monopole résultant de la loi", "Un monopole naturel", "Un monopole public", "Un monopole temporaire"], 0, "Le monopole légal est un monopole résultant de la loi (brevets).", "hard"],
+        ["Qu'est-ce que les barrières à l'entrée ?", ["Des obstacles empêchant l'entrée de nouveaux producteurs sur le marché", "Des barrières commerciales", "Des barrières douanières", "Des barrières administratives"], 0, "Les barrières à l'entrée sont des obstacles empêchant l'entrée de nouveaux producteurs sur le marché.", "hard"],
+        ["Quels sont les types de barrières à l'entrée ?", ["Barrières légales, économiques, techniques", "Barrières légales uniquement", "Barrières économiques uniquement", "Barrières techniques uniquement"], 0, "Les types de barrières à l'entrée : légales, économiques, techniques.", "hard"],
+        ["Qu'est-ce que la défaillance du marché ?", ["L'incapacité du marché à atteindre l'efficacité économique", "Le succès du marché", "L'équilibre du marché", "La stabilité du marché"], 0, "La défaillance du marché est l'incapacité du marché à atteindre l'efficacité économique.", "hard"],
+        ["Quelles sont les causes de la défaillance du marché ?", ["Monopole, externalités, information asymétrique, biens publics", "Monopole uniquement", "Externalités uniquement", "Information uniquement"], 0, "Les causes de la défaillance du marché : monopole, externalités, information asymétrique, biens publics.", "hard"],
+        ["Qu'est-ce que les externalités ?", ["Des effets secondaires de l'activité économique sur des tiers", "Les coûts internes", "Les revenus", "Les profits"], 0, "Les externalités sont des effets secondaires de l'activité économique sur des tiers.", "hard"],
+        ["Qu'est-ce que les externalités négatives ?", ["Des effets négatifs de l'activité économique sur des tiers", "Des effets positifs", "Aucun effet", "Effets limités"], 0, "Les externalités négatives sont des effets négatifs de l'activité économique sur des tiers (pollution).", "hard"],
+        ["Qu'est-ce que les externalités positives ?", ["Des effets positifs de l'activité économique sur des tiers", "Des effets négatifs", "Aucun effet", "Effets limités"], 0, "Les externalités positives sont des effets positifs de l'activité économique sur des tiers (éducation).", "hard"],
+        ["Qu'est-ce que les biens publics ?", ["Des biens dont personne ne peut être exclu de la consommation", "Des biens privés", "Des biens communs", "Des biens de luxe"], 0, "Les biens publics sont des biens dont personne ne peut être exclu de la consommation (sécurité).", "hard"],
+        ["Qu'est-ce que le modèle IS-LM ?", ["Un modèle montrant l'équilibre sur le marché des biens et le marché de la monnaie", "Un modèle commercial", "Un modèle de production", "Un modèle de distribution"], 0, "Le modèle IS-LM montre l'équilibre sur le marché des biens et le marché de la monnaie.", "hard"],
+        ["Qu'est-ce que la courbe IS ?", ["Une courbe montrant l'équilibre sur le marché des biens", "La courbe du marché de la monnaie", "La courbe de demande globale", "La courbe d'offre globale"], 0, "La courbe IS montre l'équilibre sur le marché des biens.", "hard"],
+        ["Qu'est-ce que la courbe LM ?", ["Une courbe montrant l'équilibre sur le marché de la monnaie", "La courbe du marché des biens", "La courbe de demande globale", "La courbe d'offre globale"], 0, "La courbe LM montre l'équilibre sur le marché de la monnaie.", "hard"],
+        ["Qu'est-ce que le modèle de demande globale et d'offre globale ?", ["Un modèle montrant l'équilibre macroéconomique", "Un modèle microéconomique", "Un modèle commercial", "Un modèle financier"], 0, "Le modèle de demande globale et d'offre globale montre l'équilibre macroéconomique.", "hard"],
+        ["Qu'est-ce que la courbe de demande globale ?", ["Une courbe montrant la relation entre le niveau des prix et la production demandée", "La courbe de demande individuelle", "La courbe d'offre", "La courbe de coût"], 0, "La courbe de demande globale montre la relation entre le niveau des prix et la production demandée.", "hard"],
+        ["Qu'est-ce que la courbe d'offre globale ?", ["Une courbe montrant la relation entre le niveau des prix et la production offerte", "La courbe d'offre individuelle", "La courbe de demande", "La courbe de coût"], 0, "La courbe d'offre globale montre la relation entre le niveau des prix et la production offerte.", "hard"],
+        ["Qu'est-ce que l'équilibre macroéconomique ?", ["L'intersection de la demande globale et de l'offre globale", "L'équilibre du marché", "L'équilibre du consommateur", "L'équilibre du producteur"], 0, "L'équilibre macroéconomique est l'intersection de la demande globale et de l'offre globale.", "hard"],
+        ["Qu'est-ce que la politique budgétaire ?", ["L'utilisation des recettes et dépenses publiques pour atteindre des objectifs économiques", "Le contrôle de la monnaie", "La régulation du commerce", "La régulation de l'industrie"], 0, "La politique budgétaire utilise les recettes et dépenses publiques pour atteindre des objectifs économiques.", "hard"],
+        ["Qu'est-ce que la politique monétaire expansionniste ?", ["Augmenter la masse monétaire pour stimuler l'économie", "Réduire la masse monétaire", "Stabiliser la masse monétaire", "Augmenter les impôts"], 0, "La politique monétaire expansionniste augmente la masse monétaire pour stimuler l'économie.", "hard"],
+        ["Qu'est-ce que la politique monétaire restrictive ?", ["Réduire la masse monétaire pour lutter contre l'inflation", "Augmenter la masse monétaire", "Stabiliser la masse monétaire", "Réduire les impôts"], 0, "La politique monétaire restrictive réduit la masse monétaire pour lutter contre l'inflation.", "hard"],
+        ["Qu'est-ce que la politique budgétaire expansionniste ?", ["Augmenter les dépenses publiques ou réduire les impôts", "Réduire les dépenses", "Augmenter les impôts", "Réduire les dettes"], 0, "La politique budgétaire expansionniste augmente les dépenses publiques ou réduit les impôts.", "hard"],
+        ["Qu'est-ce que la politique budgétaire restrictive ?", ["Réduire les dépenses publiques ou augmenter les impôts", "Augmenter les dépenses", "Réduire les impôts", "Augmenter les dettes"], 0, "La politique budgétaire restrictive réduit les dépenses publiques ou augmente les impôts.", "hard"],
+        ["Qu'est-ce que l'inflation par la demande ?", ["Une inflation résultant de l'augmentation de la demande globale", "Une inflation résultant de l'augmentation des coûts", "Une inflation résultant de l'augmentation de la monnaie", "Une inflation résultant de la baisse de l'offre"], 0, "L'inflation par la demande est une inflation résultant de l'augmentation de la demande globale.", "hard"],
+        ["Qu'est-ce que l'inflation par les coûts ?", ["Une inflation résultant de l'augmentation des coûts", "Une inflation résultant de l'augmentation de la demande", "Une inflation résultant de l'augmentation de la monnaie", "Une inflation résultant de la baisse de l'offre"], 0, "L'inflation par les coûts est une inflation résultant de l'augmentation des coûts.", "hard"],
+        ["Quelle est la relation entre l'inflation et le chômage (courbe de Phillips) ?", ["Une relation inverse entre l'inflation et le chômage à court terme", "Une relation positive", "Aucune relation", "Une relation aléatoire"], 0, "La courbe de Phillips montre une relation inverse entre l'inflation et le chômage à court terme.", "hard"],
+        ["Qu'est-ce que le taux de chômage naturel ?", ["Le taux de chômage qui ne cause pas d'inflation", "Le taux de chômage zéro", "Le taux de chômage élevé", "Le taux de chômage saisonnier"], 0, "Le taux de chômage naturel est le taux de chômage qui ne cause pas d'inflation.", "hard"],
+        ["Qu'est-ce que la loi d'Okun ?", ["Une relation entre le chômage et la production", "Une relation entre l'inflation et le chômage", "Une relation entre la monnaie et les prix", "Une relation entre l'investissement et la croissance"], 0, "La loi d'Okun montre une relation entre le chômage et la production.", "hard"],
+        ["Qu'est-ce que la croissance économique durable ?", ["Une croissance qui préserve les ressources pour les générations futures", "Une croissance rapide", "Une croissance lente", "Une croissance volatile"], 0, "La croissance économique durable préserve les ressources pour les générations futures.", "hard"],
+        ["Quelles sont les théories de la croissance économique ?", ["Théorie classique, keynésienne, néoclassique, endogène", "Une seule théorie", "Deux théories", "Trois théories"], 0, "Les théories de la croissance : classique, keynésienne, néoclassique, endogène.", "hard"],
+        ["Qu'est-ce que la théorie classique de la croissance ?", ["La croissance dépend de l'accumulation du capital et du travail", "La croissance dépend de la demande", "La croissance dépend de la monnaie", "La croissance dépend du commerce"], 0, "La théorie classique : la croissance dépend de l'accumulation du capital et du travail.", "hard"],
+        ["Qu'est-ce que la théorie keynésienne de la croissance ?", ["La croissance dépend de la demande globale", "La croissance dépend de l'offre", "La croissance dépend de la monnaie", "La croissance dépend du commerce"], 0, "La théorie keynésienne : la croissance dépend de la demande globale.", "hard"],
+        ["Qu'est-ce que la théorie néoclassique de la croissance ?", ["La croissance dépend de la technologie et de l'accumulation du capital", "La croissance dépend de la demande", "La croissance dépend de la monnaie", "La croissance dépend du commerce"], 0, "La théorie néoclassique : la croissance dépend de la technologie et de l'accumulation du capital.", "hard"],
+        ["Qu'est-ce que la théorie endogène de la croissance ?", ["La croissance dépend de facteurs internes comme l'innovation et la connaissance", "La croissance dépend de facteurs externes", "La croissance dépend de la demande", "La croissance dépend de la monnaie"], 0, "La théorie endogène : la croissance dépend de facteurs internes comme l'innovation et la connaissance.", "hard"],
+        ["Qu'est-ce que le capital humain ?", ["La connaissance, les compétences et les capacités humaines", "Le capital physique", "Le capital financier", "Le capital naturel"], 0, "Le capital humain est la connaissance, les compétences et les capacités humaines.", "hard"],
+        ["Qu'est-ce que le capital social ?", ["Les réseaux, les relations et la confiance dans la société", "Le capital physique", "Le capital humain", "Le capital naturel"], 0, "Le capital social est les réseaux, les relations et la confiance dans la société.", "hard"],
+        ["Quelle est la structure du PIB de la Mauritanie ?", ["Mines, pêche, agriculture, services, commerce", "Industrie uniquement", "Agriculture uniquement", "Commerce uniquement"], 0, "La structure du PIB de la Mauritanie : mines, pêche, agriculture, services, commerce.", "hard"],
+        ["Quelle est la part du secteur des services dans le PIB ?", ["Une part moyenne à importante", "Une part faible", "Aucune part", "Une part secondaire"], 0, "Le secteur des services contribue à une part moyenne à importante du PIB.", "hard"],
+        ["Quels sont les principaux défis de l'économie mauritanienne ?", ["Diversification, chômage, pauvreté, infrastructures", "Aucun défi", "Défis mineurs", "Défis limités"], 0, "Les principaux défis : diversification, chômage, pauvreté, infrastructures.", "hard"],
+        ["Quel est le rôle du secteur privé dans l'économie mauritanienne ?", ["Partenaire essentiel du développement et de l'emploi", "Rôle secondaire", "Aucun rôle", "Rôle limité"], 0, "Le secteur privé est un partenaire essentiel du développement et de l'emploi.", "hard"],
+        ["Quel est le rôle du secteur public dans l'économie mauritanienne ?", ["Régulation, orientation et fourniture de services publics", "Rôle commercial", "Rôle industriel", "Rôle agricole"], 0, "Le rôle du secteur public : régulation, orientation et fourniture de services publics.", "hard"],
+        ["Quel est le rôle de la CNSS dans l'économie ?", ["Protection sociale contribuant à la stabilité économique", "Rôle commercial", "Aucun rôle", "Rôle limité"], 0, "La CNSS contribue à la stabilité économique par la protection sociale.", "hard"],
+        ["Qu'est-ce que la Stratégie de Croissance Accélérée et de Prospérité Partagée ?", ["Une stratégie de développement globale", "Une stratégie sectorielle", "Une stratégie temporaire", "Une stratégie locale"], 0, "La Stratégie de Croissance Accélérée et de Prospérité Partagée est une stratégie de développement globale.", "hard"],
+        ["Quels sont les objectifs de la Stratégie de Croissance Accélérée et de Prospérité Partagée ?", ["Croissance économique rapide et amélioration du niveau de vie", "Augmenter les exportations", "Augmenter les importations", "Augmenter les impôts"], 0, "Les objectifs : croissance économique rapide et amélioration du niveau de vie.", "hard"],
+        ["Quels sont les axes de la Stratégie de Croissance Accélérée et de Prospérité Partagée ?", ["Agriculture, pêche, mines, tourisme, infrastructures", "Agriculture uniquement", "Pêche uniquement", "Mines uniquement"], 0, "Les axes : agriculture, pêche, mines, tourisme, infrastructures.", "hard"],
+        ["Quel est le rôle de l'énergie dans l'économie mauritanienne ?", ["Un secteur prometteur avec les découvertes de gaz", "Aucun rôle", "Rôle secondaire", "Rôle limité"], 0, "L'énergie est un secteur prometteur avec les découvertes de gaz (champ Grand Tortue Ahmeyim).", "hard"],
+        ["Quel est le rôle du tourisme dans l'économie mauritanienne ?", ["Un secteur prometteur avec un fort potentiel", "Aucun rôle", "Rôle secondaire", "Rôle limité"], 0, "Le tourisme est un secteur prometteur avec un fort potentiel.", "hard"],
+        ["Quel est le rôle de l'élevage dans l'économie mauritanienne ?", ["Un secteur important contribuant au PIB et à l'emploi", "Aucun rôle", "Rôle secondaire", "Rôle limité"], 0, "L'élevage est un secteur important contribuant au PIB et à l'emploi.", "hard"],
+        ["Quels sont les principaux défis du secteur agricole en Mauritanie ?", ["Sécheresse, désertification, manque d'eau, faible financement", "Aucun défi", "Défis mineurs", "Défis limités"], 0, "Les principaux défis : sécheresse, désertification, manque d'eau, faible financement.", "hard"],
+        ["Quels sont les principaux défis du secteur de la pêche en Mauritanie ?", ["Surpêche, épuisement, concurrence étrangère", "Aucun défi", "Défis mineurs", "Défis limités"], 0, "Les principaux défis : surpêche, épuisement, concurrence étrangère.", "hard"],
+        ["Quels sont les principaux défis du secteur minier en Mauritanie ?", ["Fluctuations des prix, dépendance, épuisement des ressources", "Aucun défi", "Défis mineurs", "Défis limités"], 0, "Les principaux défis : fluctuations des prix, dépendance, épuisement des ressources.", "hard"],
+        ["Quel est le rôle de l'investissement étranger dans l'économie mauritanienne ?", ["Important pour financer les grands projets", "Aucun rôle", "Rôle secondaire", "Rôle limité"], 0, "L'investissement étranger est important pour financer les grands projets.", "hard"],
+        ["Quels sont les domaines de l'investissement étranger en Mauritanie ?", ["Mines, pêche, énergie, infrastructures", "Agriculture uniquement", "Industrie uniquement", "Services uniquement"], 0, "Les domaines de l'investissement étranger : mines, pêche, énergie, infrastructures.", "hard"],
+        ["Quelle est la relation entre l'investissement étranger et le développement ?", ["L'investissement étranger peut contribuer au développement sous conditions", "Aucune relation", "L'investissement suffit au développement", "Le développement suffit à l'investissement"], 0, "L'investissement étranger peut contribuer au développement sous conditions (transfert de technologie, emploi, exportation).", "hard"],
+        ["Quelles sont les conditions pour bénéficier de l'investissement étranger ?", ["Environnement des affaires favorable, stabilité, infrastructures", "Aucune condition", "Conditions simples", "Conditions limitées"], 0, "Les conditions : environnement des affaires favorable, stabilité, infrastructures.", "hard"],
+        ["Quel est le rôle de l'État dans l'encouragement de l'investissement ?", ["Fournir un environnement des affaires favorable et des incitations", "Aucun rôle", "Rôle secondaire", "Rôle limité"], 0, "Le rôle de l'État : fournir un environnement des affaires favorable et des incitations.", "hard"],
+        ["Quelles sont les zones d'économie franche en Mauritanie ?", ["Zones commerciales franches", "Zones agricoles", "Zones industrielles", "Zones touristiques"], 0, "Les zones d'économie franche en Mauritanie sont des zones commerciales franches.", "hard"],
+        ["Quel est le rôle de la zone franche de Nouadhibou dans l'économie ?", ["Un pôle économique, commercial et industriel", "Une zone agricole", "Une zone touristique", "Une zone résidentielle"], 0, "La zone franche de Nouadhibou est un pôle économique, commercial et industriel.", "hard"],
+        ["Quel est le rôle du Port de l'Amitié dans l'économie ?", ["Un port commercial important", "Un port de pêche", "Un port militaire", "Un port touristique"], 0, "Le Port de l'Amitié est un port commercial important.", "hard"],
+        ["Quel est le rôle de l'Aéroport International de Nouakchott dans l'économie ?", ["Relier la Mauritanie au monde", "Un aéroport intérieur", "Un aéroport militaire", "Un aéroport privé"], 0, "L'Aéroport International de Nouakchott relie la Mauritanie au monde.", "hard"],
+        ["Quelles sont les infrastructures essentielles au développement en Mauritanie ?", ["Routes, ports, aéroports, électricité, eau", "Routes uniquement", "Ports uniquement", "Électricité uniquement"], 0, "Les infrastructures essentielles : routes, ports, aéroports, électricité, eau.", "hard"],
+        ["Quels sont les types de politique budgétaire ?", ["Expansionniste, restrictive, neutre", "Expansionniste uniquement", "Restrictive uniquement", "Neutre uniquement"], 0, "Les types de politique budgétaire : expansionniste, restrictive, neutre.", "hard"],
+        ["Qu'est-ce que la politique budgétaire neutre ?", ["Une politique qui n'augmente ni ne réduit la demande globale", "Une politique expansionniste", "Une politique restrictive", "Une politique mixte"], 0, "La politique budgétaire neutre n'augmente ni ne réduit la demande globale.", "hard"],
+        ["Quelles sont les limites de la politique budgétaire ?", ["Délai temporel, effets inflationnistes, déficit budgétaire", "Aucune limite", "Limites simples", "Limites limitées"], 0, "Les limites de la politique budgétaire : délai temporel, effets inflationnistes, déficit budgétaire.", "hard"],
+        ["Quelles sont les limites de la politique monétaire ?", ["Trappe à liquidité, délai temporel, indépendance", "Aucune limite", "Limites simples", "Limites limitées"], 0, "Les limites de la politique monétaire : trappe à liquidité, délai temporel, indépendance.", "hard"],
+        ["Qu'est-ce que la trappe à liquidité ?", ["Une situation où le taux d'intérêt est très bas, empêchant la politique monétaire de stimuler l'économie", "Une situation inflationniste", "Une situation déflationniste", "Une situation de récession"], 0, "La trappe à liquidité est une situation où le taux d'intérêt est très bas, empêchant la politique monétaire de stimuler l'économie.", "hard"],
+        ["Qu'est-ce que la coordination entre politique budgétaire et monétaire ?", ["Une coopération entre le gouvernement et la Banque Centrale", "Une opposition", "Aucune coordination", "Coordination limitée"], 0, "La coordination entre politique budgétaire et monétaire est une coopération entre le gouvernement et la Banque Centrale.", "hard"],
+        ["Quelle est l'importance de l'indépendance de la Banque Centrale ?", ["Garantir la stabilité des prix et l'absence de pressions politiques", "Aucune importance", "Importance secondaire", "Importance limitée"], 0, "L'indépendance de la Banque Centrale garantit la stabilité des prix et l'absence de pressions politiques.", "hard"],
+        ["Quelles sont les missions de la Banque Centrale de Mauritanie ?", ["Émission de la monnaie, politique monétaire, supervision des banques", "Émission de la monnaie uniquement", "Politique monétaire uniquement", "Supervision des banques uniquement"], 0, "Les missions de la BCM : émission de la monnaie, politique monétaire, supervision des banques.", "hard"],
+        ["Quels sont les instruments de la Banque Centrale de Mauritanie ?", ["Taux d'intérêt, réserves obligatoires, opérations d'open market", "Taux d'intérêt uniquement", "Réserves obligatoires uniquement", "Opérations d'open market uniquement"], 0, "Les instruments de la BCM : taux d'intérêt, réserves obligatoires, opérations d'open market.", "hard"],
+        ["Qu'est-ce que le système bancaire mauritanien ?", ["Banque Centrale, banques commerciales et institutions financières", "Banque Centrale uniquement", "Banques commerciales uniquement", "Institutions financières uniquement"], 0, "Le système bancaire mauritanien : Banque Centrale, banques commerciales et institutions financières.", "hard"],
+        ["Quel est le rôle des banques dans l'économie ?", ["Collecter l'épargne et financer les investissements", "Émettre la monnaie", "Percevoir les impôts", "Réguler le commerce"], 0, "Le rôle des banques : collecter l'épargne et financer les investissements.", "hard"],
+        ["Quels sont les types de banques ?", ["Banques commerciales, d'investissement, islamiques, spécialisées", "Banques commerciales uniquement", "Banques d'investissement uniquement", "Banques islamiques uniquement"], 0, "Les types de banques : commerciales, d'investissement, islamiques, spécialisées.", "hard"],
+        ["Qu'est-ce qu'une banque islamique ?", ["Une banque qui opère selon les principes de la charia", "Une banque commerciale", "Une banque d'investissement", "Une banque centrale"], 0, "Une banque islamique opère selon les principes de la charia.", "hard"],
+        ["Quels sont les instruments de la banque islamique ?", ["Mourabaha, Moudaraba, Moucharaka, Ijara", "Mourabaha uniquement", "Moudaraba uniquement", "Moucharaka uniquement"], 0, "Les instruments de la banque islamique : Mourabaha, Moudaraba, Moucharaka, Ijara.", "hard"],
+        ["Qu'est-ce que la microfinance ?", ["Un financement de petite taille pour les micro-entreprises", "Un financement important", "Un financement moyen", "Un financement public"], 0, "La microfinance est un financement de petite taille pour les micro-entreprises.", "hard"],
+        ["Quelle est l'importance de la microfinance ?", ["Lutter contre la pauvreté et encourager les micro-entreprises", "Aucune importance", "Importance secondaire", "Importance limitée"], 0, "La microfinance est importante pour lutter contre la pauvreté et encourager les micro-entreprises.", "hard"],
+        ["Quelle est la relation entre l'épargne et l'investissement ?", ["L'épargne est une source d'investissement", "Aucune relation", "L'investissement est une source d'épargne", "Relation inverse"], 0, "L'épargne est une source d'investissement.", "hard"],
+        ["Quels sont les déterminants de l'épargne ?", ["Revenu, taux d'intérêt, anticipations, culture", "Revenu uniquement", "Taux d'intérêt uniquement", "Anticipations uniquement"], 0, "Les déterminants de l'épargne : revenu, taux d'intérêt, anticipations, culture.", "hard"],
+        ["Quels sont les déterminants de l'investissement ?", ["Taux d'intérêt, anticipations, demande, technologie", "Taux d'intérêt uniquement", "Anticipations uniquement", "Demande uniquement"], 0, "Les déterminants de l'investissement : taux d'intérêt, anticipations, demande, technologie.", "hard"],
+        ["Quelle est la relation entre l'investissement et la croissance ?", ["L'investissement est un moteur de la croissance économique", "Aucune relation", "La croissance est un moteur de l'investissement", "Relation inverse"], 0, "L'investissement est un moteur de la croissance économique.", "hard"],
+        ["Quels sont les types d'investissement ?", ["Investissement direct, indirect, local, étranger", "Investissement direct uniquement", "Investissement indirect uniquement", "Investissement local uniquement"], 0, "Les types d'investissement : direct, indirect, local, étranger.", "hard"],
+        ["Qu'est-ce que l'investissement public ?", ["Un investissement réalisé par l'État", "Un investissement privé", "Un investissement étranger", "Un investissement mixte"], 0, "L'investissement public est un investissement réalisé par l'État.", "hard"],
+        ["Qu'est-ce que l'investissement privé ?", ["Un investissement réalisé par le secteur privé", "Un investissement public", "Un investissement étranger", "Un investissement mixte"], 0, "L'investissement privé est un investissement réalisé par le secteur privé.", "hard"],
+        ["Qu'est-ce que l'investissement mixte ?", ["Un investissement conjoint entre le secteur public et privé", "Un investissement public", "Un investissement privé", "Un investissement étranger"], 0, "L'investissement mixte est un investissement conjoint entre le secteur public et privé.", "hard"],
+        ["Quelle est l'importance de l'investissement en capital humain ?", ["Améliorer la productivité et l'innovation", "Aucune importance", "Importance secondaire", "Importance limitée"], 0, "L'investissement en capital humain améliore la productivité et l'innovation.", "hard"]
+    ];
+
+    // ============================================================
+    // LOGIQUE DU QUIZ
+    // ============================================================
+    const TOTAL = QUESTIONS.length; // 300
+    let currentIndex = 0;
+    let userAnswers = new Array(TOTAL).fill(null); // null = non répondu, sinon index choisi
+    let score = 0;
+    let answered = new Array(TOTAL).fill(false); // true si déjà répondu (feedback affiché)
+
+    // DOM
+    const questionCounter = document.getElementById('questionCounter');
+    const difficultyBadge = document.getElementById('difficultyBadge');
+    const scoreDisplay = document.getElementById('scoreDisplay');
+    const progressFill = document.getElementById('progressFill');
+    const questionText = document.getElementById('questionText');
+    const optionsContainer = document.getElementById('optionsContainer');
+    const feedbackBox = document.getElementById('feedbackBox');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const questionContainer = document.getElementById('questionContainer');
+    const resultContainer = document.getElementById('resultContainer');
+    const finalScore = document.getElementById('finalScore');
+    const finalMessage = document.getElementById('finalMessage');
+    const restartBtn = document.getElementById('restartBtn');
+
+    // Initialisation
+    function init() {
+        currentIndex = 0;
+        userAnswers = new Array(TOTAL).fill(null);
+        answered = new Array(TOTAL).fill(false);
+        score = 0;
+        questionContainer.classList.remove('hidden');
+        resultContainer.classList.add('hidden');
+        renderQuestion();
+        updateScoreAndProgress();
+    }
+
+    // Mettre à jour score et barre de progression
+    function updateScoreAndProgress() {
+        // score = nombre de bonnes réponses
+        let correctCount = 0;
+        for (let i = 0; i < TOTAL; i++) {
+            if (userAnswers[i] !== null && userAnswers[i] === QUESTIONS[i][2]) {
+                correctCount++;
+            }
+        }
+        score = correctCount;
+        scoreDisplay.textContent = `Score: ${score}`;
+        const progressPercent = ((currentIndex + 1) / TOTAL) * 100;
+        progressFill.style.width = progressPercent + '%';
+        questionCounter.textContent = `Question ${currentIndex + 1} / ${TOTAL}`;
+    }
+
+    // Afficher la question courante
+    function renderQuestion() {
+        const q = QUESTIONS[currentIndex];
+        const difficulty = q[4];
+        const diffLabel = difficulty === 'easy' ? 'Facile' : (difficulty === 'medium' ? 'Moyenne' : 'Difficile');
+        difficultyBadge.textContent = diffLabel;
+        difficultyBadge.style.background = difficulty === 'easy' ? '#e6f4ea' : (difficulty === 'medium' ? '#fff3e0' : '#fdecea');
+        difficultyBadge.style.color = difficulty === 'easy' ? '#1e7b4b' : (difficulty === 'medium' ? '#b45f06' : '#b83b3b');
+
+        questionText.textContent = q[0];
+        optionsContainer.innerHTML = '';
+        const letters = ['A', 'B', 'C', 'D'];
+        const correctIdx = q[2];
+        const alreadyAnswered = answered[currentIndex];
+        const selectedIdx = userAnswers[currentIndex];
+
+        q[1].forEach((choice, idx) => {
+            const div = document.createElement('div');
+            div.className = 'option';
+            if (alreadyAnswered) {
+                div.classList.add('disabled');
+                if (idx === correctIdx) div.classList.add('correct');
+                if (selectedIdx === idx && idx !== correctIdx) div.classList.add('wrong');
+            } else if (selectedIdx === idx) {
+                div.classList.add('selected');
+            }
+            div.innerHTML = `<span class="letter">${letters[idx]}</span><span>${choice}</span>`;
+            div.dataset.index = idx;
+            div.addEventListener('click', () => selectOption(idx));
+            optionsContainer.appendChild(div);
+        });
+
+        // Feedback
+        if (alreadyAnswered) {
+            const isCorrect = (selectedIdx === correctIdx);
+            feedbackBox.className = 'feedback show';
+            feedbackBox.innerHTML = isCorrect
+                ? `<span class="correct-badge">✅ Bonne réponse.</span> ${q[3]}`
+                : `<span class="wrong-badge">❌ Réponse incorrecte.</span> La bonne réponse est : <strong>${q[1][correctIdx]}</strong>.<br><span style="font-size:0.9rem;">${q[3]}</span>`;
+        } else {
+            feedbackBox.className = 'feedback';
+            feedbackBox.innerHTML = '';
+        }
+
+        // Boutons
+        prevBtn.disabled = (currentIndex === 0);
+        // Le bouton "Suivant" est activé si la question a été répondue OU si c'est la dernière question (pour terminer)
+        if (currentIndex === TOTAL - 1) {
+            nextBtn.textContent = 'Terminer l\'examen';
+            nextBtn.disabled = !alreadyAnswered && selectedIdx === null;
+        } else {
+            nextBtn.textContent = 'Suivant →';
+            nextBtn.disabled = !alreadyAnswered && selectedIdx === null;
+        }
+
+        // Mise à jour score
+        updateScoreAndProgress();
+    }
+
+    // Sélection d'une option
+    function selectOption(idx) {
+        if (answered[currentIndex]) return; // déjà répondu
+        userAnswers[currentIndex] = idx;
+        answered[currentIndex] = true;
+
+        // Mettre à jour le rendu visuel
+        const correctIdx = QUESTIONS[currentIndex][2];
+        const options = optionsContainer.children;
+        for (let i = 0; i < options.length; i++) {
+            options[i].classList.add('disabled');
+            if (i === correctIdx) options[i].classList.add('correct');
+            if (i === idx && i !== correctIdx) options[i].classList.add('wrong');
+            if (i === idx && i === correctIdx) options[i].classList.add('correct');
+        }
+
+        // Feedback
+        const q = QUESTIONS[currentIndex];
+        const isCorrect = (idx === correctIdx);
+        feedbackBox.className = 'feedback show';
+        feedbackBox.innerHTML = isCorrect
+            ? `<span class="correct-badge">✅ Bonne réponse.</span> ${q[3]}`
+            : `<span class="wrong-badge">❌ Réponse incorrecte.</span> La bonne réponse est : <strong>${q[1][correctIdx]}</strong>.<br><span style="font-size:0.9rem;">${q[3]}</span>`;
+
+        // Mettre à jour le score
+        updateScoreAndProgress();
+
+        // Activer le bouton suivant
+        if (currentIndex === TOTAL - 1) {
+            nextBtn.textContent = 'Terminer l\'examen';
+        }
+        nextBtn.disabled = false;
+    }
+
+    // Navigation
+    function goToNext() {
+        if (currentIndex < TOTAL - 1) {
+            // Vérifier si la question actuelle a une réponse
+            if (userAnswers[currentIndex] === null) return;
+            currentIndex++;
+            renderQuestion();
+        } else {
+            // Fin de l'examen
+            if (userAnswers[currentIndex] === null) return;
+            showResult();
+        }
+    }
+
+    function goToPrev() {
+        if (currentIndex > 0) {
+            currentIndex--;
+            renderQuestion();
+        }
+    }
+
+    // Afficher le résultat final
+    function showResult() {
+        // Compter les bonnes réponses
+        let correct = 0;
+        for (let i = 0; i < TOTAL; i++) {
+            if (userAnswers[i] !== null && userAnswers[i] === QUESTIONS[i][2]) correct++;
+        }
+        questionContainer.classList.add('hidden');
+        resultContainer.classList.remove('hidden');
+        finalScore.textContent = `${correct} / ${TOTAL}`;
+        let msg = '';
+        const pct = (correct / TOTAL) * 100;
+        if (pct >= 80) msg = '🏆 Excellent ! Très bonne maîtrise.';
+        else if (pct >= 60) msg = '👍 Bonne performance, continuez à réviser.';
+        else if (pct >= 40) msg = '📚 Des efforts à fournir, mais des bases présentes.';
+        else msg = '💪 Continuez à travailler, vous progresserez.';
+        finalMessage.textContent = msg;
+        // Mettre à jour la barre de progression à 100%
+        progressFill.style.width = '100%';
+        questionCounter.textContent = `Examen terminé`;
+        scoreDisplay.textContent = `Score: ${correct}`;
+    }
+
+    // Écouteurs
+    prevBtn.addEventListener('click', goToPrev);
+    nextBtn.addEventListener('click', goToNext);
+    restartBtn.addEventListener('click', init);
+
+    // Démarrer
+    init();
+</script>
+</body>
+</html>
